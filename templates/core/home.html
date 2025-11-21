@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}KIABA - Site de rencontres et petites annonces adultes en Côte d'Ivoire{% endblock %}
+{% block description %}KIABA est le site de rencontres et petites annonces adultes #1 en Côte d'Ivoire. Bizi Abidjan, rencontres, escort, jedolo, locanto. Plus de {{ total_approved_ads }} annonces vérifiées.{% endblock %}
+{% block keywords %}kiaba, kiaba rencontre, bizi abidjan, bizi côte d'ivoire, jedolo, locanto, prostitution abidjan, escort abidjan, rencontres abidjan, petites annonces adultes, côte d'ivoire, ivoire, abidjan, bouaké, daloa, yamoussoukro, san-pédro, korhogo, man, gagnoa{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "KIABA",
+  "alternateName": "KIABA Rencontre",
+  "url": "https://ci-kiaba.com",
+  "description": "Site de rencontres et petites annonces adultes en Côte d'Ivoire",
+  "inLanguage": "fr-CI",
+  "publisher": {
+    "@type": "Organization",
+    "name": "KIABA",
+    "url": "https://ci-kiaba.com",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "CI",
+      "addressLocality": "Abidjan"
+    }
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://ci-kiaba.com/ads?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  },
+  "sameAs": [
+    "https://ci-kiaba.com"
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-blue-600 to-purple-700 text-white py-16 md:py-24">
+  <div class="max-w-7xl mx-auto px-4 text-center">
+    <h1 class="text-4xl md:text-6xl font-bold mb-6">
+      KIABA
+      <span class="block text-2xl md:text-3xl font-normal text-blue-100">
+        Rencontres & Petites Annonces Adultes
+      </span>
+    </h1>
+    <p class="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+      Le site de rencontres #1 en Côte d'Ivoire. Plus de <strong>{{ total_approved_ads }}</strong> annonces vérifiées.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="/ads" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition shadow-lg">
+        Voir les annonces
+      </a>
+      <a href="/post" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-blue-600 transition">
+        Publier une annonce
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="bg-white py-12">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+      <div class="bg-blue-50 rounded-xl p-6">
+        <div class="text-3xl font-bold text-blue-600 mb-2">{{ total_approved_ads }}+</div>
+        <div class="text-gray-600">Annonces actives</div>
+      </div>
+      <div class="bg-green-50 rounded-xl p-6">
+        <div class="text-3xl font-bold text-green-600 mb-2">100+</div>
+        <div class="text-gray-600">Villes couvertes</div>
+      </div>
+      <div class="bg-purple-50 rounded-xl p-6">
+        <div class="text-3xl font-bold text-purple-600 mb-2">24/7</div>
+        <div class="text-gray-600">Support client</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Popular Cities -->
+<section class="bg-gray-50 py-16">
+  <div class="max-w-7xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+      Annonces par ville
+    </h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      {% for city in popular_cities %}
+      <a href="/ads?city={{ city.slug }}" class="bg-white rounded-lg p-4 text-center hover:shadow-md transition">
+        <div class="font-medium text-gray-900">{{ city.name }}</div>
+        <div class="text-sm text-gray-500">{{ city.ad_count }} annonces</div>
+      </a>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-8">
+      <a href="/ads" class="text-blue-600 hover:text-blue-800 font-medium">
+        Voir toutes les villes →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Categories -->
+<section class="bg-white py-16">
+  <div class="max-w-7xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+      Catégories populaires
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <a href="/ads?category=escorte_girl" class="bg-pink-50 rounded-xl p-6 hover:shadow-md transition">
+        <div class="text-2xl mb-3">👩</div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Escorte Girls</h3>
+        <p class="text-gray-600">Rencontrez des femmes escortes à Abidjan et dans toute la Côte d'Ivoire</p>
+      </a>
+      <a href="/ads?category=escorte_boy" class="bg-blue-50 rounded-xl p-6 hover:shadow-md transition">
+        <div class="text-2xl mb-3">👨</div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Escorte Boys</h3>
+        <p class="text-gray-600">Découvrez des hommes escortes disponibles dans votre ville</p>
+      </a>
+      <a href="/ads?category=transgenre" class="bg-purple-50 rounded-xl p-6 hover:shadow-md transition">
+        <div class="text-2xl mb-3">🏳️‍⚧️</div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Transgenre</h3>
+        <p class="text-gray-600">Rencontres avec des personnes transgenres en Côte d'Ivoire</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Recent Ads Preview -->
+<section class="bg-gray-50 py-16">
+  <div class="max-w-7xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+      Dernières annonces
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for ad in recent_ads %}
+      <a href="/ads/{{ ad.slug }}" class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
+        <div class="h-48 bg-gray-200">
+          {% if ad.media.count %}
+            <img src="{{ ad.media.first.image.url }}" alt="{{ ad.title }}" class="w-full h-full object-cover">
+          {% else %}
+            <div class="w-full h-full flex items-center justify-center text-gray-400">
+              <span>Photo</span>
+            </div>
+          {% endif %}
+        </div>
+        <div class="p-4">
+          <h3 class="font-medium text-gray-900 mb-2 line-clamp-2">{{ ad.title }}</h3>
+          <div class="text-sm text-gray-500">{{ ad.city.name }} · {{ ad.get_category_display }}</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-8">
+      <a href="/ads" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition">
+        Voir toutes les annonces
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- SEO Content -->
+<section class="bg-white py-16">
+  <div class="max-w-4xl mx-auto px-4">
+    <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">
+      Pourquoi choisir KIABA ?
+    </h2>
+    <div class="prose max-w-none">
+      <p class="text-lg text-gray-600 mb-6">
+        <strong>KIABA</strong> est la plateforme de rencontres et petites annonces adultes de référence en Côte d'Ivoire. 
+        Que vous recherchiez des <strong>escortes à Abidjan</strong>, des <strong>rencontres à Bouaké</strong>, 
+        ou des <strong>services à Daloa</strong>, notre site vous connecte avec des milliers de profils vérifiés.
+      </p>
+      
+      <h3 class="text-xl font-bold text-gray-900 mb-4">Nos avantages :</h3>
+      <ul class="list-disc list-inside text-gray-600 space-y-2 mb-6">
+        <li><strong>Annonces vérifiées</strong> : Tous nos profils sont contrôlés pour votre sécurité</li>
+        <li><strong>Couverture nationale</strong> : Présent dans plus de 100 villes de Côte d'Ivoire</li>
+        <li><strong>Gratuit</strong> : Publication et consultation d'annonces entièrement gratuites</li>
+        <li><strong>Discret</strong> : Vos données personnelles sont protégées</li>
+        <li><strong>Mobile-friendly</strong> : Interface optimisée pour smartphones et tablettes</li>
+      </ul>
+      
+      <p class="text-lg text-gray-600">
+        Rejoignez les milliers d'utilisateurs qui font confiance à <strong>KIABA</strong> pour leurs rencontres en Côte d'Ivoire. 
+        Alternative locale à <strong>Locanto</strong> et <strong>Jedolo</strong>, nous offrons une expérience adaptée 
+        aux spécificités ivoiriennes.
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}

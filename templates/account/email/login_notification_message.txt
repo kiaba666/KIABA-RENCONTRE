@@ -1,0 +1,18 @@
+Bonjour {{ user.username }},
+
+Une connexion à votre compte {{ site_name }} a été détectée.
+
+Détails de la connexion :
+- Utilisateur : {{ user.username }}
+- Email : {{ user.email }}
+- Date et heure : {% now "d/m/Y à H:i" %}
+
+Si cette connexion n'a pas été effectuée par vous, veuillez :
+1. Changer immédiatement votre mot de passe
+2. Nous contacter à support@ci-kiaba.com
+
+Pour changer votre mot de passe : {{ site_url }}/accounts/password/change/
+
+Cordialement,
+L'équipe {{ site_name }}
+support@ci-kiaba.com

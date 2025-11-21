@@ -1,0 +1,22 @@
+Bonjour {{ user.username }},
+
+Félicitations ! Votre annonce "{{ ad.title }}" a été publiée avec succès sur {{ site_name }}.
+
+Détails de votre annonce :
+- Titre : {{ ad.title }}
+- Catégorie : {{ ad.get_category_display }}
+- Ville : {{ ad.city.name }}
+- Date de publication : {{ ad.created_at|date:"d/m/Y à H:i" }}
+- Expiration : {{ ad.expires_at|date:"d/m/Y à H:i" }}
+
+Votre annonce est maintenant visible par tous les visiteurs de {{ site_name }}.
+
+Pour voir votre annonce : {{ ad_url }}
+
+Pour gérer vos annonces : {{ site_url }}/dashboard/
+
+Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter.
+
+Cordialement,
+L'équipe {{ site_name }}
+support@ci-kiaba.com

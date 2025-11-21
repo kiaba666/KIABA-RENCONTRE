@@ -1,0 +1,18 @@
+Bonjour {{ user.username }},
+
+Bienvenue sur KIABA, la plateforme de petites annonces pour adultes en Côte d'Ivoire !
+
+Pour activer votre compte et commencer à publier vos annonces, veuillez cliquer sur le lien ci-dessous :
+
+{{ activate_url }}
+
+Une fois votre compte activé, vous pourrez :
+- Publier des annonces gratuitement
+- Gérer votre profil et vos préférences de contact
+- Suivre les statistiques de vos annonces
+
+Si vous n'avez pas créé de compte sur KIABA, veuillez ignorer cet email.
+
+Cordialement,
+L'équipe KIABA
+support@ci-kiaba.com

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+  {% load static %}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}KIABA · Côte d'Ivoire · 18+{% endblock %}</title>
+    <meta
+      name="description"
+      content="{% block description %}KIABA - Site de rencontres et petites annonces adultes en Côte d'Ivoire. Bizi Abidjan, rencontres, escort, jedolo, locanto. 18+{% endblock %}"
+    />
+    <meta
+      name="keywords"
+      content="{% block keywords %}kiaba, kiaba rencontre, bizi abidjan, bizi côte d'ivoire, jedolo, locanto, prostitution abidjan, escort abidjan, rencontres abidjan, petites annonces adultes, côte d'ivoire, ivoire, abidjan, bouaké, daloa, yamoussoukro{% endblock %}"
+    />
+    <meta name="author" content="KIABA" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="fr" />
+    <meta name="geo.region" content="CI" />
+    <meta name="geo.country" content="Côte d'Ivoire" />
+    <meta name="geo.placename" content="Abidjan" />
+    <meta name="distribution" content="global" />
+    <meta name="rating" content="adult" />
+    <meta name="revisit-after" content="1 days" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="{% block og_url %}https://ci-kiaba.com{% endblock %}"
+    />
+    <meta
+      property="og:title"
+      content="{% block og_title %}KIABA · Côte d'Ivoire · 18+{% endblock %}"
+    />
+    <meta
+      property="og:description"
+      content="{% block og_description %}KIABA - Site de rencontres et petites annonces adultes en Côte d'Ivoire. Bizi Abidjan, rencontres, escort, jedolo, locanto. 18+{% endblock %}"
+    />
+    <meta
+      property="og:image"
+      content="{% block og_image %}https://ci-kiaba.com{% static 'img/logo.png' %}{% endblock %}"
+    />
+    <meta property="og:site_name" content="KIABA" />
+    <meta property="og:locale" content="fr_CI" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta
+      property="twitter:url"
+      content="{% block twitter_url %}https://ci-kiaba.com{% endblock %}"
+    />
+    <meta
+      property="twitter:title"
+      content="{% block twitter_title %}KIABA · Côte d'Ivoire · 18+{% endblock %}"
+    />
+    <meta
+      property="twitter:description"
+      content="{% block twitter_description %}KIABA - Site de rencontres et petites annonces adultes en Côte d'Ivoire. Bizi Abidjan, rencontres, escort, jedolo, locanto. 18+{% endblock %}"
+    />
+    <meta
+      property="twitter:image"
+      content="{% block twitter_image %}https://ci-kiaba.com{% static 'img/logo.png' %}{% endblock %}"
+    />
+
+    <!-- Canonical URL -->
+    <link
+      rel="canonical"
+      href="{% block canonical_url %}https://ci-kiaba.com{% endblock %}"
+    />
+
+    <!-- Hreflang Tags for SEO Local -->
+    <link
+      rel="alternate"
+      hreflang="fr-CI"
+      href="{% block hreflang_fr_ci %}https://ci-kiaba.com{% endblock %}"
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="{% block hreflang_default %}https://ci-kiaba.com{% endblock %}"
+    />
+
+    <!-- Google Search Console Verification -->
+    <meta
+      name="google-site-verification"
+      content="uJGTtVemQQT42MBUlLWzHWvX7r3IpCy2iczSO-mXBP0"
+    />
+
+    <!-- Preconnect to external resources for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://unpkg.com" crossorigin />
+    {% if GA_MEASUREMENT_ID %}
+    <link
+      rel="preconnect"
+      href="https://www.googletagmanager.com"
+      crossorigin
+    />
+    <link
+      rel="preconnect"
+      href="https://www.google-analytics.com"
+      crossorigin
+    />
+    {% endif %}
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    <link rel="dns-prefetch" href="https://unpkg.com" />
+
+    <!-- JSON-LD Structured Data - Organization & LocalBusiness -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "KIABA",
+        "alternateName": "KIABA Rencontre",
+        "url": "https://ci-kiaba.com",
+        "description": "Site de rencontres et petites annonces adultes en Côte d'Ivoire. Bizi Abidjan, rencontres, escort, jedolo, locanto.",
+        "inLanguage": "fr-CI",
+        "publisher": {
+          "@type": "Organization",
+          "@id": "https://ci-kiaba.com/#organization",
+          "name": "KIABA",
+          "url": "https://ci-kiaba.com",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://ci-kiaba.com/static/img/logo.png",
+            "width": 200,
+            "height": 60
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "support@ci-kiaba.com",
+            "contactType": "customer service",
+            "areaServed": "CI",
+            "availableLanguage": ["fr"]
+          },
+          "sameAs": ["https://ci-kiaba.com"]
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://ci-kiaba.com/ads?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "@id": "https://ci-kiaba.com/#localbusiness",
+        "name": "KIABA",
+        "alternateName": "KIABA Rencontre",
+        "description": "Site de rencontres et petites annonces adultes en Côte d'Ivoire. Bizi Abidjan, rencontres, escort, jedolo, locanto.",
+        "url": "https://ci-kiaba.com",
+        "telephone": "+225",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "CI",
+          "addressLocality": "Abidjan",
+          "addressRegion": "Lagunes"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "5.3600",
+          "longitude": "-4.0083"
+        },
+        "areaServed": {
+          "@type": "Country",
+          "name": "Côte d'Ivoire"
+        },
+        "priceRange": "Gratuit",
+        "openingHours": "Mo-Su 00:00-23:59"
+      }
+    </script>
+
+    {% block structured_data %}{% endblock %}
+    
+    {% block tailwind_css %}
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    /></noscript>
+    {% endblock %}
+    
+    {% block htmx_js %}
+    <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+    {% endblock %}
+    <style>
+      .glass {
+        backdrop-filter: saturate(180%) blur(10px);
+        background-color: rgba(255, 255, 255, 0.7);
+      }
+      .line-clamp-1 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+      }
+      .line-clamp-2 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+    </style>
+    {% block extra_head %}{% endblock %}
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="{% static 'favicon.png' %}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="{% static 'favicon.png' %}"
+    />
+    <link rel="shortcut icon" href="{% static 'favicon.png' %}" />
+    <link rel="apple-touch-icon" href="{% static 'favicon.png' %}" />
+    <meta name="theme-color" content="#0ea5e9" />
+  </head>
+  <body class="min-h-full bg-gradient-to-b from-blue-50 to-white">
+    {% block header %}
+    <header class="sticky top-0 z-40 glass border-b">
+      <div
+        class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between"
+      >
+        <a href="/" class="text-2xl font-semibold tracking-tight text-gray-900">
+          <img
+            src="{% static 'img/logo.png' %}"
+            alt="KIABA - Site de rencontres et petites annonces adultes en Côte d'Ivoire"
+            class="h-8 w-auto"
+            loading="eager"
+            width="264"
+            height="112"
+          />
+        </a>
+        <nav class="hidden md:flex items-center gap-3">
+          <a href="/ads" class="text-gray-700 hover:text-gray-900">Annonces</a>
+          {% if user.is_authenticated %}
+          <a
+            href="/dashboard/"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium"
+          >
+            Mon compte
+          </a>
+          {% else %}
+          <a
+            href="/auth/login/"
+            class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition font-medium"
+          >
+            Se connecter
+          </a>
+          {% endif %}
+        </nav>
+        <div class="md:hidden flex items-center gap-2">
+          {% if user.is_authenticated %}
+          <a
+            href="/dashboard/"
+            class="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+            >Mon compte</a
+          >
+          {% else %}
+          <a
+            href="/auth/login/"
+            class="bg-gray-600 text-white px-3 py-2 rounded-lg text-sm font-medium"
+            >Se connecter</a
+          >
+          {% endif %}
+        </div>
+      </div>
+    </header>
+    {% endblock %}
+    {% block cta_section %}
+    <!-- CTA Publier après le header (uniforme sur toutes les pages) -->
+    <section class="bg-gradient-to-br from-pink-500 to-red-500 text-white">
+      <div class="max-w-7xl mx-auto p-3 md:p-4 text-center">
+        <h2 class="text-lg md:text-xl font-semibold mb-1">
+          Vous êtes prestataire ?
+        </h2>
+        <p class="text-pink-100 mb-3 text-sm">
+          Publiez votre annonce gratuitement et trouvez vos clients
+        </p>
+        <a
+          href="/post/"
+          class="inline-flex items-center bg-white text-pink-600 px-5 py-2 rounded-lg font-medium hover:bg-pink-50 transition text-sm shadow"
+        >
+          <svg
+            class="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            ></path>
+          </svg>
+          Publier une annonce
+        </a>
+      </div>
+    </section>
+    {% endblock %}
+    {% block counter_section %}
+    <!-- Compteur d'annonces -->
+    <section class="bg-white border-b">
+      <div
+        class="max-w-7xl mx-auto px-4 py-3 text-center text-sm text-gray-700"
+      >
+        <span
+          >Nombre total d'annonces en ligne :
+          <strong>{{ total_approved_ads }}</strong></span
+        >
+      </div>
+    </section>
+    {% endblock %}
+
+    <main
+      class="{% block main_class %}max-w-7xl mx-auto p-3 md:p-4{% endblock %}"
+    >
+      {% if messages %}
+      <div class="max-w-3xl mx-auto mb-4 space-y-2">
+        {% for message in messages %}
+        <div
+          class="rounded-lg border px-4 py-3 text-sm {% if message.tags == 'success' %} bg-green-50 border-green-200 text-green-800 {% endif %} {% if message.tags == 'info' %} bg-blue-50 border-blue-200 text-blue-800 {% endif %} {% if message.tags == 'warning' %} bg-yellow-50 border-yellow-200 text-yellow-800 {% endif %} {% if message.tags == 'error' %} bg-red-50 border-red-200 text-red-800 {% endif %}"
+        >
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Breadcrumbs -->
+      {% block breadcrumbs %}{% endblock %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-gray-50 border-t border-gray-200 mt-8">
+      <div class="max-w-7xl mx-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
+          <!-- Navigation -->
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-3">Navigation</h3>
+            <ul class="space-y-2 text-sm text-gray-600">
+              <li>
+                <a href="/ads" class="hover:text-gray-900 underline"
+                  >Annonces</a
+                >
+              </li>
+              <li>
+                <a href="/post" class="hover:text-gray-900 underline"
+                  >Publier une annonce</a
+                >
+              </li>
+              <li>
+                <a href="/legal/tos" class="hover:text-gray-900 underline"
+                  >CGU</a
+                >
+              </li>
+              <li>
+                <a href="/legal/privacy" class="hover:text-gray-900 underline"
+                  >Confidentialité</a
+                >
+              </li>
+              <li>
+                <a
+                  href="/legal/content-policy"
+                  class="hover:text-gray-900 underline"
+                  >Politique de contenu</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- Villes populaires (SEO - maillage interne) -->
+          {% if popular_cities_footer %}
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-3">Villes populaires</h3>
+            <ul class="space-y-2 text-sm text-gray-600">
+              {% for city in popular_cities_footer %}
+              <li>
+                <a
+                  href="/ads?city={{ city.slug }}"
+                  class="hover:text-gray-900 underline"
+                  >Annonces à {{ city.name }}</a
+                >
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          <!-- Contact -->
+          <div>
+            <h3 class="font-semibold text-gray-900 mb-3">Contact</h3>
+            <ul class="space-y-2 text-sm text-gray-600">
+              <li>
+                Email:
+                <a
+                  href="mailto:support@ci-kiaba.com"
+                  class="hover:text-gray-900 underline"
+                  >support@ci-kiaba.com</a
+                >
+              </li>
+              <li>© 2025 KIABA</li>
+              <li class="text-xs text-gray-500">Côte d'Ivoire</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Copyright -->
+        <div
+          class="border-t border-gray-200 pt-4 text-center text-xs text-gray-500"
+        >
+          <p>
+            © 2025 KIABA - Site de rencontres et petites annonces adultes en
+            Côte d'Ivoire
+          </p>
+        </div>
+      </div>
+    </footer>
+    {% endblock %} {% block extra_js %}{% endblock %}
+
+    <!-- Google Analytics - Deferred loading -->
+    {% if GA_MEASUREMENT_ID %}
+    <script>
+      // Defer GA loading until after page load
+      window.addEventListener("load", function () {
+        var script = document.createElement("script");
+        script.async = true;
+        script.src =
+          "https://www.googletagmanager.com/gtag/js?id={{ GA_MEASUREMENT_ID }}";
+        document.head.appendChild(script);
+
+        script.onload = function () {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag("js", new Date());
+          gtag("config", "{{ GA_MEASUREMENT_ID }}");
+        };
+      });
+    </script>
+    {% endif %}
+  </body>
+</html>

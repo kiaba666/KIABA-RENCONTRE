@@ -1,0 +1,78 @@
+from django.contrib.sitemaps import Sitemap
+from django.urls import reverse
+from ads.models import Ad, City
+
+
+class StaticSitemap(Sitemap):
+    changefreq = "weekly"
+    priority = 0.8
+
+    def items(self):
+        return [
+            "landing",  # core.urls name="landing"
+            "post",  # core.urls name="post"
+            "ad_list",  # ads.urls name="ad_list"
+            "account_login",  # allauth
+            "account_signup",  # allauth
+        ]
+
+    def location(self, item):
+        return reverse(item)
+
+
+class AdSitemap(Sitemap):
+    changefreq = "daily"
+    priority = 0.9
+
+    def items(self):
+        return Ad.objects.filter(status=Ad.Status.APPROVED).select_related("city")
+
+    def location(self, obj: Ad):
+        return f"/ads/{obj.slug}"
+
+    def lastmod(self, obj: Ad):
+        return obj.updated_at
+
+
+class CitySitemap(Sitemap):
+    changefreq = "weekly"
+    priority = 0.7
+
+    def items(self):
+        return City.objects.all()
+
+    def location(self, obj: City):
+        return f"/ads?city={obj.slug}"
+
+
+class CategorySitemap(Sitemap):
+    changefreq = "weekly"
+    priority = 0.6
+
+    def items(self):
+        return [
+            "escorte_girl",
+            "escorte_boy",
+            "transgenre",
+        ]
+
+    def location(self, item):
+        return f"/ads?category={item}"
+
+
+class CityCategorySitemap(Sitemap):
+    changefreq = "weekly"
+    priority = 0.8
+
+    def items(self):
+        cities = City.objects.all()
+        categories = ["escorte_girl", "escorte_boy", "transgenre"]
+        items = []
+        for city in cities:
+            for category in categories:
+                items.append((city.slug, category))
+        return items
+
+    def location(self, item):
+        city_slug, category = item
+        return f"/ads?city={city_slug}&category={category}"
