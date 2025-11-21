@@ -10,10 +10,15 @@ class CoreConfig(AppConfig):
         """Configure le site Django après le chargement"""
         from django.contrib.sites.models import Site
         from django.conf import settings
+        from django.db import connection
 
         def update_site_domain(sender, **kwargs):
-            """Met à jour le domaine du site"""
+            """Met à jour le domaine du site - appelé après les migrations"""
             try:
+                # Vérifier que la base de données est accessible
+                if not connection.ensure_connection():
+                    return
+                
                 # Use get_or_create to avoid errors if Site doesn't exist
                 site, created = Site.objects.get_or_create(
                     id=settings.SITE_ID,
@@ -31,10 +36,6 @@ class CoreConfig(AppConfig):
                 # Silently fail to prevent startup errors
                 pass
 
-        # Appeler immédiatement et aussi après migrations
-        try:
-            update_site_domain(sender=self)
-        except Exception:
-            pass
-
+        # Ne pas appeler immédiatement - seulement après migrations
+        # Cela évite d'accéder à la base de données pendant l'initialisation
         post_migrate.connect(update_site_domain, sender=self)
