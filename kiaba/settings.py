@@ -227,11 +227,18 @@ else:
     }
 
     if is_render_db:
-        # Render PostgreSQL REQUIERT SSL, même pour les connexions internes
-        # Utiliser sslmode=require pour forcer SSL
-        db_options["sslmode"] = "require"
+        # Si le host se termine par -a, c'est le host INTERNE de Render
+        # Le host interne peut avoir des problèmes avec SSL, utiliser le host externe
+        if postgres_host.endswith("-a"):
+            # Remplacer le host interne par le host externe (sans -a)
+            postgres_host = postgres_host[:-2]  # Enlever "-a"
+        
+        # Render PostgreSQL nécessite SSL pour les connexions externes
+        # Utiliser sslmode=prefer qui essaiera SSL mais acceptera non-SSL si nécessaire
+        # Cela fonctionne mieux avec les connexions Render
+        db_options["sslmode"] = "prefer"
         # Définir aussi la variable d'environnement pour psycopg2
-        os.environ["PGSSLMODE"] = "require"
+        os.environ["PGSSLMODE"] = "prefer"
 
     DATABASES = {
         "default": {
