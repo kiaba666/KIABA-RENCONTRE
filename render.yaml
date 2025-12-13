@@ -4,6 +4,8 @@ services:
     env: python
     region: frankfurt
     plan: free
+    repo: https://github.com/kiaba666/KIABA-RENCONTRE.git
+    branch: master
     autoDeploy: true
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
     startCommand: bash start.sh
