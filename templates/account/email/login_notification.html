@@ -1,0 +1,40 @@
+{% extends "account/email/base_email.html" %}
+
+{% block email_title %}Connexion détectée - KIABA{% endblock %}
+
+{% block email_content %}
+<p>Bonjour <strong>{{ user.username }}</strong>,</p>
+
+<p>Une connexion à votre compte KIABA a été détectée.</p>
+
+<div class="details">
+    <h3 style="margin-top: 0;">Détails de la connexion :</h3>
+    <dl>
+        <dt>Utilisateur :</dt>
+        <dd>{{ user.username }}</dd>
+        
+        <dt>Email :</dt>
+        <dd>{{ user.email }}</dd>
+        
+        <dt>Date et heure :</dt>
+        <dd>{% now "d/m/Y à H:i" %}</dd>
+    </dl>
+</div>
+
+<div class="warning-box">
+    <h3 style="margin-top: 0; color: #92400e;">⚠️ Sécurité</h3>
+    <p style="margin-bottom: 0;">Si cette connexion n'a pas été effectuée par vous, veuillez :</p>
+    <ol style="margin: 10px 0 0 20px; padding: 0;">
+        <li>Changer immédiatement votre mot de passe</li>
+        <li>Nous contacter à <a href="mailto:support@ci-kiaba.com">support@ci-kiaba.com</a></li>
+    </ol>
+</div>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{{ site_url }}/accounts/password/change/" class="button">Changer mon mot de passe</a>
+</div>
+
+<p>Cordialement,<br>
+<strong>L'équipe KIABA</strong></p>
+{% endblock %}
+

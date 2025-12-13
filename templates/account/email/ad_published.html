@@ -1,0 +1,49 @@
+{% extends "account/email/base_email.html" %}
+
+{% block email_title %}Votre annonce est en ligne - KIABA{% endblock %}
+
+{% block email_content %}
+<p>Bonjour <strong>{{ user.username }}</strong>,</p>
+
+<p>Félicitations ! Votre annonce a été publiée avec succès sur KIABA et est maintenant visible par tous les visiteurs.</p>
+
+<div class="info-box">
+    <h3 style="margin-top: 0; color: #1e40af;">Votre annonce est en ligne !</h3>
+    <p style="margin-bottom: 0;">Les visiteurs peuvent maintenant la consulter et vous contacter.</p>
+</div>
+
+<div class="details">
+    <h3 style="margin-top: 0;">Détails de votre annonce :</h3>
+    <dl>
+        <dt>Titre :</dt>
+        <dd>{{ ad.title }}</dd>
+        
+        <dt>Catégorie :</dt>
+        <dd>{{ ad.get_category_display }}</dd>
+        
+        <dt>Ville :</dt>
+        <dd>{{ ad.city.name }}</dd>
+        
+        <dt>Date de publication :</dt>
+        <dd>{{ ad.created_at|date:"d/m/Y à H:i" }}</dd>
+        
+        <dt>Expiration :</dt>
+        <dd>{{ ad.expires_at|date:"d/m/Y à H:i" }}</dd>
+    </dl>
+</div>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{{ ad_url }}" class="button">Voir mon annonce</a>
+</div>
+
+<p>Pour gérer toutes vos annonces, rendez-vous sur votre tableau de bord :</p>
+<p style="text-align: center;">
+    <a href="{{ site_url }}/dashboard/" style="color: #3b82f6; font-weight: 600;">Accéder à mon tableau de bord</a>
+</p>
+
+<p>Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter à <a href="mailto:support@ci-kiaba.com">support@ci-kiaba.com</a>.</p>
+
+<p>Cordialement,<br>
+<strong>L'équipe KIABA</strong></p>
+{% endblock %}
+

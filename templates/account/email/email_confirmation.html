@@ -1,0 +1,39 @@
+{% extends "account/email/base_email.html" %}
+
+{% block email_title %}Activez votre compte KIABA{% endblock %}
+
+{% block email_content %}
+<p>Bonjour <strong>{{ user.username }}</strong>,</p>
+
+<p>Bienvenue sur <strong>KIABA</strong>, la plateforme de rencontres et petites annonces pour adultes en Côte d'Ivoire !</p>
+
+<div class="info-box">
+    <h3 style="margin-top: 0; color: #1e40af;">Activation de votre compte</h3>
+    <p style="margin-bottom: 0;">Pour activer votre compte et commencer à publier vos annonces, cliquez sur le bouton ci-dessous.</p>
+</div>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{{ activate_url }}" class="button">Activer mon compte</a>
+</div>
+
+<p>Ou copiez ce lien dans votre navigateur :</p>
+<p style="word-break: break-all; color: #6b7280; font-size: 12px;">{{ activate_url }}</p>
+
+<div class="details">
+    <h3 style="margin-top: 0;">Une fois votre compte activé, vous pourrez :</h3>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li>✓ Publier des annonces gratuitement</li>
+        <li>✓ Gérer votre profil et vos préférences de contact</li>
+        <li>✓ Suivre les statistiques de vos annonces</li>
+        <li>✓ Recevoir des notifications importantes</li>
+    </ul>
+</div>
+
+<div class="warning-box">
+    <p style="margin: 0;"><strong>⚠️ Important :</strong> Si vous n'avez pas créé de compte sur KIABA, veuillez ignorer cet email.</p>
+</div>
+
+<p>Cordialement,<br>
+<strong>L'équipe KIABA</strong></p>
+{% endblock %}
+
