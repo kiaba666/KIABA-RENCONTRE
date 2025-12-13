@@ -221,16 +221,18 @@ else:
     postgres_host = env("POSTGRES_HOST", default="")
     is_render_db = "render.com" in postgres_host.lower() or os.environ.get("RENDER_EXTERNAL_URL")
 
-    # Options SSL explicites pour Render - utiliser require (pas prefer)
+    # Options de connexion de base
     db_options = {
         "connect_timeout": 10,
     }
 
     if is_render_db:
-        # Forcer SSL avec require - c'est obligatoire sur Render
-        db_options["sslmode"] = "require"
-        # Définir aussi la variable d'environnement pour psycopg2
-        os.environ["PGSSLMODE"] = "require"
+        # Le host avec -a est le host INTERNE de Render
+        # Les connexions internes sur Render peuvent ne PAS nécessiter SSL
+        # Ne pas spécifier sslmode pour laisser psycopg2 négocier automatiquement
+        # Si le serveur propose SSL, il sera utilisé, sinon la connexion se fera sans SSL
+        # Ne pas définir PGSSLMODE non plus pour laisser la négociation automatique
+        pass  # Pas d'options SSL pour le host interne
 
     DATABASES = {
         "default": {
@@ -241,7 +243,7 @@ else:
             "HOST": postgres_host,
             "PORT": env("POSTGRES_PORT"),
             "OPTIONS": db_options,
-            "CONN_MAX_AGE": 0,  # Désactiver le pooling pour éviter les problèmes de connexion SSL
+            "CONN_MAX_AGE": 0,  # Désactiver le pooling pour éviter les problèmes de connexion
             "ATOMIC_REQUESTS": True,
         }
     }
