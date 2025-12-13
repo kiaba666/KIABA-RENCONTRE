@@ -227,12 +227,11 @@ else:
     }
 
     if is_render_db:
-        # Le host avec -a est le host INTERNE de Render
-        # Les connexions internes sur Render peuvent ne PAS nécessiter SSL
-        # Ne pas spécifier sslmode pour laisser psycopg2 négocier automatiquement
-        # Si le serveur propose SSL, il sera utilisé, sinon la connexion se fera sans SSL
-        # Ne pas définir PGSSLMODE non plus pour laisser la négociation automatique
-        pass  # Pas d'options SSL pour le host interne
+        # Render PostgreSQL REQUIERT SSL, même pour les connexions internes
+        # Utiliser sslmode=require pour forcer SSL
+        db_options["sslmode"] = "require"
+        # Définir aussi la variable d'environnement pour psycopg2
+        os.environ["PGSSLMODE"] = "require"
 
     DATABASES = {
         "default": {
