@@ -218,18 +218,21 @@ if "test" in sys.argv or env("DB_ENGINE") == "sqlite":
     }
 else:
     # Configuration PostgreSQL avec SSL pour Render
+    postgres_host = env("POSTGRES_HOST", default="")
+    is_render_db = "render.com" in postgres_host.lower() or os.environ.get("RENDER_EXTERNAL_URL")
+
+    # Options de base
     db_options = {
         "connect_timeout": 10,
     }
 
     # Sur Render, les bases de données PostgreSQL nécessitent SSL
-    # Vérifier si on est sur Render (présence de RENDER_EXTERNAL_URL ou host Render)
-    postgres_host = env("POSTGRES_HOST", default="")
-    is_render_db = "render.com" in postgres_host.lower() or os.environ.get("RENDER_EXTERNAL_URL")
-
     if is_render_db:
-        # Options SSL pour Render PostgreSQL
-        db_options["sslmode"] = "require"
+        # Pour Render PostgreSQL, utiliser sslmode=prefer d'abord (plus permissif)
+        # Si ça ne fonctionne pas, essayer require
+        db_options["sslmode"] = "prefer"
+        # Définir la variable d'environnement pour psycopg2
+        os.environ["PGSSLMODE"] = "prefer"
 
     DATABASES = {
         "default": {
@@ -240,8 +243,8 @@ else:
             "HOST": env("POSTGRES_HOST"),
             "PORT": env("POSTGRES_PORT"),
             "OPTIONS": db_options,
-            "CONN_MAX_AGE": 600,  # Réutiliser les connexions pendant 10 minutes
-            "ATOMIC_REQUESTS": True,  # Transactions automatiques par requête
+            "CONN_MAX_AGE": 0,  # Désactiver le pooling pour éviter les problèmes de connexion SSL
+            "ATOMIC_REQUESTS": True,
         }
     }
 
