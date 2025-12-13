@@ -233,12 +233,11 @@ else:
             # Remplacer le host interne par le host externe (sans -a)
             postgres_host = postgres_host[:-2]  # Enlever "-a"
         
-        # Render PostgreSQL nécessite SSL pour les connexions externes
-        # Utiliser sslmode=prefer qui essaiera SSL mais acceptera non-SSL si nécessaire
-        # Cela fonctionne mieux avec les connexions Render
-        db_options["sslmode"] = "prefer"
+        # Render PostgreSQL REQUIERT SSL pour les connexions externes
+        # Utiliser sslmode=require pour forcer SSL avec le host externe
+        db_options["sslmode"] = "require"
         # Définir aussi la variable d'environnement pour psycopg2
-        os.environ["PGSSLMODE"] = "prefer"
+        os.environ["PGSSLMODE"] = "require"
 
     DATABASES = {
         "default": {
