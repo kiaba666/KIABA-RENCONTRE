@@ -221,18 +221,25 @@ else:
     postgres_host = env("POSTGRES_HOST", default="")
     is_render_db = "render.com" in postgres_host.lower() or os.environ.get("RENDER_EXTERNAL_URL")
 
-    # Options de base
+    # Sur Render, le host interne se termine par -a.oregon-postgres.render.com
+    # Utiliser le host externe (sans le -a) pour une meilleure compatibilité SSL
+    if is_render_db and postgres_host.endswith("-a.oregon-postgres.render.com"):
+        # Remplacer -a.oregon par .oregon pour obtenir le host externe
+        postgres_host = postgres_host.replace("-a.oregon-postgres.render.com", ".oregon-postgres.render.com")
+    elif is_render_db and postgres_host.endswith("-a"):
+        # Fallback : enlever juste le -a
+        postgres_host = postgres_host.rsplit("-a", 1)[0]
+
+    # Options SSL explicites pour Render
     db_options = {
         "connect_timeout": 10,
     }
 
-    # Sur Render, les bases de données PostgreSQL nécessitent SSL
     if is_render_db:
-        # Pour Render PostgreSQL, utiliser sslmode=prefer d'abord (plus permissif)
-        # Si ça ne fonctionne pas, essayer require
-        db_options["sslmode"] = "prefer"
-        # Définir la variable d'environnement pour psycopg2
-        os.environ["PGSSLMODE"] = "prefer"
+        # Forcer SSL avec require (pas prefer)
+        db_options["sslmode"] = "require"
+        # Définir aussi la variable d'environnement pour psycopg2
+        os.environ["PGSSLMODE"] = "require"
 
     DATABASES = {
         "default": {
@@ -240,7 +247,7 @@ else:
             "NAME": env("POSTGRES_DB"),
             "USER": env("POSTGRES_USER"),
             "PASSWORD": env("POSTGRES_PASSWORD"),
-            "HOST": env("POSTGRES_HOST"),
+            "HOST": postgres_host,
             "PORT": env("POSTGRES_PORT"),
             "OPTIONS": db_options,
             "CONN_MAX_AGE": 0,  # Désactiver le pooling pour éviter les problèmes de connexion SSL
