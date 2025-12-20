@@ -5,9 +5,12 @@ import hashlib
 import hmac
 import json
 import requests
+import logging
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 
 class CinetPayService:
@@ -16,10 +19,19 @@ class CinetPayService:
     @staticmethod
     def get_config():
         """Récupère la configuration CinetPay depuis les settings"""
+        site_id = getattr(settings, "CINETPAY_SITE_ID", "") or ""
+        api_key = getattr(settings, "CINETPAY_API_KEY", "") or ""
+        site_key = getattr(settings, "CINETPAY_SITE_KEY", "") or ""
+        
+        # Debug: logger les valeurs (sans exposer les clés complètes)
+        logger.debug(f"CinetPay config - SITE_ID: {site_id[:5]}... (len: {len(site_id)})")
+        logger.debug(f"CinetPay config - API_KEY: {api_key[:5]}... (len: {len(api_key)})")
+        logger.debug(f"CinetPay config - SITE_KEY: {site_key[:5]}... (len: {len(site_key)})")
+        
         return {
-            "site_id": getattr(settings, "CINETPAY_SITE_ID", ""),
-            "api_key": getattr(settings, "CINETPAY_API_KEY", ""),
-            "site_key": getattr(settings, "CINETPAY_SITE_KEY", ""),
+            "site_id": site_id,
+            "api_key": api_key,
+            "site_key": site_key,
             "notify_url": getattr(
                 settings,
                 "CINETPAY_NOTIFY_URL",
@@ -42,8 +54,17 @@ class CinetPayService:
         """Crée un lien de paiement CinetPay"""
         config = CinetPayService.get_config()
         
-        if not config["site_id"] or not config["api_key"]:
-            raise ValueError("Configuration CinetPay incomplète")
+        # Vérifier que toutes les clés nécessaires sont présentes
+        missing = []
+        if not config["site_id"]:
+            missing.append("CINETPAY_SITE_ID")
+        if not config["api_key"]:
+            missing.append("CINETPAY_API_KEY")
+        
+        if missing:
+            raise ValueError(
+                f"Configuration CinetPay incomplète. Variables manquantes: {', '.join(missing)}"
+            )
         
         transaction_id = CinetPayService.generate_transaction_id(
             transaction.user_id,
@@ -95,8 +116,17 @@ class CinetPayService:
         """Vérifie le statut d'un paiement CinetPay"""
         config = CinetPayService.get_config()
         
-        if not config["site_id"] or not config["api_key"]:
-            raise ValueError("Configuration CinetPay incomplète")
+        # Vérifier que toutes les clés nécessaires sont présentes
+        missing = []
+        if not config["site_id"]:
+            missing.append("CINETPAY_SITE_ID")
+        if not config["api_key"]:
+            missing.append("CINETPAY_API_KEY")
+        
+        if missing:
+            raise ValueError(
+                f"Configuration CinetPay incomplète. Variables manquantes: {', '.join(missing)}"
+            )
         
         params = {
             "apikey": config["api_key"],
