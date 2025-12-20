@@ -218,13 +218,16 @@ def dashboard(request: HttpRequest) -> HttpResponse:
         return redirect("/auth/login/")
     
     # S'assurer que le profil existe
-    profile, created = Profile.objects.get_or_create(
-        user=request.user,
-        defaults={"display_name": request.user.username}
-    )
+    try:
+        profile = request.user.profile
+    except Profile.DoesNotExist:
+        profile = Profile.objects.create(
+            user=request.user,
+            display_name=request.user.username
+        )
     
     my_ads = Ad.objects.filter(user=request.user).order_by("-created_at")[:50]
-    return render(request, "core/dashboard.html", {"ads": my_ads})
+    return render(request, "core/dashboard.html", {"ads": my_ads, "profile": profile})
 
 
 # Pages légales

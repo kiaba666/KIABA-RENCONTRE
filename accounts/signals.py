@@ -14,14 +14,32 @@ from .tasks import (
 @receiver(user_logged_in)
 def on_user_logged_in(sender, user, request, **kwargs):  # pragma: no cover
     try:
+        # S'assurer que le profil existe
+        from .models import Profile
+        if not hasattr(user, 'profile'):
+            try:
+                Profile.objects.get(user=user)
+            except Profile.DoesNotExist:
+                Profile.objects.create(
+                    user=user,
+                    display_name=user.username
+                )
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Erreur lors de la création du profil: {e}", exc_info=True)
+    
+    try:
         # Envoyer l'email immédiatement en production
         from django.conf import settings
 
         if not settings.DEBUG:
             send_login_notification_email.delay(user.id)
-    except Exception:
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Erreur lors de l'envoi de l'email de notification: {e}", exc_info=True)
         # Let login proceed; task retries will handle transient errors
-        pass
 
 
 @receiver(pre_save, sender=CustomUser)

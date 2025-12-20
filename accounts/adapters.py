@@ -151,18 +151,31 @@ class NoRateLimitAccountAdapter(DefaultAccountAdapter):
         """Redirection après connexion"""
         # Marquer le profil comme vérifié après la première connexion
         try:
-            profile = request.user.profile
-            if not profile.is_verified:
-                profile.is_verified = True
-                profile.save()
-                logger.info(f"Profil de {request.user.username} marqué comme vérifié")
-        except Exception:
-            pass
+            if hasattr(request.user, 'profile'):
+                profile = request.user.profile
+                if not profile.is_verified:
+                    profile.is_verified = True
+                    profile.save()
+                    logger.info(f"Profil de {request.user.username} marqué comme vérifié")
+            else:
+                # Créer le profil s'il n'existe pas
+                from .models import Profile
+                profile, created = Profile.objects.get_or_create(
+                    user=request.user,
+                    defaults={"display_name": request.user.username}
+                )
+                if created:
+                    logger.info(f"Profil créé pour {request.user.username}")
+        except Exception as e:
+            logger.error(f"Erreur lors de la gestion du profil: {e}", exc_info=True)
 
-        # Envoyer l'email de notification de connexion
-        from .tasks import send_login_notification_email
-
-        send_login_notification_email.delay(request.user.id)
+        # Envoyer l'email de notification de connexion (en arrière-plan, ne pas bloquer)
+        try:
+            from .tasks import send_login_notification_email
+            send_login_notification_email.delay(request.user.id)
+        except Exception as e:
+            logger.error(f"Erreur lors de l'envoi de l'email de notification: {e}", exc_info=True)
+        
         return "/dashboard/"
 
     def get_logout_redirect_url(self, request):
