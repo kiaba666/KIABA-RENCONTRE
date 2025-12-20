@@ -54,6 +54,8 @@ services:
         value: "1317052651681a6fdef33a80.27918103"
       - key: CINETPAY_SITE_KEY
         value: "9694017766946fdd7c66b09.59234458"
+      - key: CINETPAY_MODE
+        value: "PRODUCTION"
       - key: CINETPAY_NOTIFY_URL
         value: "https://ci-kiaba.com/accounts/payment/cinetpay/notify/"
       - key: CINETPAY_RETURN_URL
