@@ -47,6 +47,17 @@ services:
         value: "KIABA <support@ci-kiaba.com>"
       - key: SERVER_EMAIL
         value: "KIABA Errors <errors@ci-kiaba.com>"
+      # CinetPay configuration
+      - key: CINETPAY_SITE_ID
+        value: "105907241"
+      - key: CINETPAY_API_KEY
+        value: "9694017766946fdd7c66b09.59234458"
+      - key: CINETPAY_SITE_KEY
+        value: "9694017766946fdd7c66b09.59234458"
+      - key: CINETPAY_NOTIFY_URL
+        value: "https://ci-kiaba.com/accounts/payment/cinetpay/notify/"
+      - key: CINETPAY_RETURN_URL
+        value: "https://ci-kiaba.com/accounts/payment/cinetpay/return/"
     disks:
       - name: media
         mountPath: /app/media
