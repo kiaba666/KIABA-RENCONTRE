@@ -111,7 +111,30 @@ def post(request: HttpRequest) -> HttpResponse:
                 )
             return redirect("/dashboard/")
     else:
-        form = AdForm()
+        # Initialiser le formulaire avec les données de l'utilisateur si disponibles
+        initial_data = {}
+        try:
+            if hasattr(request.user, 'profile') and request.user.profile:
+                initial_data = {
+                    "phone1": request.user.phone_e164 or "",
+                    "phone2": request.user.profile.whatsapp_e164 or "",
+                    "contact_methods": request.user.profile.contact_prefs or [],
+                }
+            elif request.user.is_authenticated:
+                initial_data = {
+                    "phone1": request.user.phone_e164 or "",
+                    "phone2": "",
+                    "contact_methods": [],
+                }
+        except Exception:
+            # Si erreur, utiliser des valeurs par défaut
+            initial_data = {
+                "phone1": "",
+                "phone2": "",
+                "contact_methods": [],
+            }
+        
+        form = AdForm(initial=initial_data)
 
     return render(request, "core/post.html", {"form": form})
 
