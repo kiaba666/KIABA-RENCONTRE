@@ -228,25 +228,20 @@ else:
 
     if is_render_db:
         # Sur Render, utiliser le host INTERNE (avec -a) pour les connexions internes
-        # Si le host ne se termine pas par -a, on essaie de le construire
-        if not postgres_host.endswith("-a") and postgres_host.endswith(".oregon-postgres.render.com"):
+        # Vérifier si le host contient déjà -a.oregon-postgres.render.com
+        if "-a.oregon-postgres.render.com" not in postgres_host and postgres_host.endswith(".oregon-postgres.render.com"):
             # C'est le host externe, on doit utiliser le host interne pour les connexions internes
             # Sur Render, les services web peuvent se connecter via le host interne
             # Construire le host interne en ajoutant -a avant .oregon-postgres.render.com
             postgres_host = postgres_host.replace(".oregon-postgres.render.com", "-a.oregon-postgres.render.com")
         
-        # Si le host se termine par -a, c'est le host INTERNE de Render
-        # Les connexions internes sur Render ne nécessitent PAS SSL
-        if postgres_host.endswith("-a.oregon-postgres.render.com") or postgres_host.endswith("-a"):
-            # Host interne : désactiver SSL complètement
-            # Utiliser 'disable' pour forcer une connexion non-SSL
-            db_options["sslmode"] = "disable"
-            # Définir aussi la variable d'environnement pour être sûr
-            os.environ["PGSSLMODE"] = "disable"
-            # Désactiver aussi les vérifications SSL au niveau système si nécessaire
-            os.environ.pop("PGSSLROOTCERT", None)
-            os.environ.pop("PGSSLCERT", None)
-            os.environ.pop("PGSSLKEY", None)
+        # Si le host contient -a.oregon-postgres.render.com, c'est le host INTERNE de Render
+        # Note: Même le host interne peut nécessiter SSL selon la configuration Render
+        if "-a.oregon-postgres.render.com" in postgres_host:
+            # Host interne : utiliser 'prefer' qui essaie SSL mais accepte non-SSL si SSL échoue
+            # Si le serveur exige SSL, 'prefer' utilisera SSL
+            db_options["sslmode"] = "prefer"
+            os.environ["PGSSLMODE"] = "prefer"
         else:
             # Host externe : forcer SSL
             db_options["sslmode"] = "require"

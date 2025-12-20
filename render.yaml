@@ -29,7 +29,7 @@ services:
       - key: POSTGRES_PASSWORD
         value: "zQ7fPBQvrEER5NDQVAqjCWHBbfFQCuIx"
       - key: POSTGRES_HOST
-        value: "dpg-d40ucg49c44c73cdi0qg-a.oregon-postgres.render.com"
+        value: "dpg-d40ucg49c44c73cdi0qg.oregon-postgres.render.com"
       - key: POSTGRES_PORT
         value: "5432"
       # Email configuration (remove EMAIL_BACKEND - handled by settings.py)
