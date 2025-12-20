@@ -227,12 +227,26 @@ else:
     }
 
     if is_render_db:
+        # Sur Render, utiliser le host INTERNE (avec -a) pour les connexions internes
+        # Si le host ne se termine pas par -a, on essaie de le construire
+        if not postgres_host.endswith("-a") and postgres_host.endswith(".oregon-postgres.render.com"):
+            # C'est le host externe, on doit utiliser le host interne pour les connexions internes
+            # Sur Render, les services web peuvent se connecter via le host interne
+            # Construire le host interne en ajoutant -a avant .oregon-postgres.render.com
+            postgres_host = postgres_host.replace(".oregon-postgres.render.com", "-a.oregon-postgres.render.com")
+        
         # Si le host se termine par -a, c'est le host INTERNE de Render
         # Les connexions internes sur Render ne nécessitent PAS SSL
-        if postgres_host.endswith("-a"):
-            # Host interne : désactiver SSL
+        if postgres_host.endswith("-a.oregon-postgres.render.com") or postgres_host.endswith("-a"):
+            # Host interne : désactiver SSL complètement
+            # Utiliser 'disable' pour forcer une connexion non-SSL
             db_options["sslmode"] = "disable"
+            # Définir aussi la variable d'environnement pour être sûr
             os.environ["PGSSLMODE"] = "disable"
+            # Désactiver aussi les vérifications SSL au niveau système si nécessaire
+            os.environ.pop("PGSSLROOTCERT", None)
+            os.environ.pop("PGSSLCERT", None)
+            os.environ.pop("PGSSLKEY", None)
         else:
             # Host externe : forcer SSL
             db_options["sslmode"] = "require"
