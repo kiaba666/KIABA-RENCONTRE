@@ -1,13 +1,10 @@
 """
-Script de management Django pour importer des annonces depuis ci.jedolo.com
-Crée 546 utilisateurs avec au moins 2 annonces chacun
+Script de management Django pour créer des utilisateurs et annonces
+Crée 100 utilisateurs avec 300 annonces au total
 """
 import os
-import re
 import random
-import requests
 from io import BytesIO
-from urllib.parse import urljoin, urlparse
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
@@ -16,11 +13,6 @@ from django.db import transaction
 from ads.models import City, Ad, AdMedia
 from accounts.models import Profile
 import bleach
-
-try:
-    from bs4 import BeautifulSoup
-except ImportError:
-    BeautifulSoup = None
 
 try:
     from PIL import Image
@@ -39,7 +31,6 @@ IVOIRIAN_NAMES = [
     "Traore", "Toure", "Cisse", "Coulibaly", "Diakite", "Kone", "Sidibe", "Sylla",
 ]
 
-# Prénoms supplémentaires
 FIRST_NAMES = [
     "Marie", "Sophie", "Julie", "Sarah", "Emma", "Laura", "Camille", "Lea",
     "Thomas", "Pierre", "Jean", "Paul", "Marc", "Luc", "Antoine", "Nicolas",
@@ -47,62 +38,163 @@ FIRST_NAMES = [
     "Amadou", "Bakary", "Ibrahima", "Mamadou", "Ousmane", "Sekou", "Tidiane",
 ]
 
+# Données d'annonces réalistes basées sur le style de ci.jedolo.com
+ANNOUNCE_DATA = [
+    {
+        "title": "Belle jeune femme disponible à Abidjan",
+        "description": "Jeune femme élégante et discrète, disponible pour vous accompagner dans vos moments de détente. Service de qualité avec professionnalisme.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Escort Girls"],
+    },
+    {
+        "title": "Massage relaxant et thérapeutique",
+        "description": "Massage professionnel pour vous détendre après une longue journée. Techniques variées selon vos besoins. Cadre agréable et discret.",
+        "category": Ad.Category.MASSAGES_SERVICES,
+        "subcategories": ["Massage Relaxant", "Massage sensuel ou érotique"],
+    },
+    {
+        "title": "Accompagnement élégant et discret",
+        "description": "Service d'accompagnement pour vos sorties et événements. Présence élégante et discrète garantie. Disponible selon vos besoins.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Escort Girls"],
+    },
+    {
+        "title": "Massage Ivoirien traditionnel",
+        "description": "Découvrez les bienfaits du massage traditionnel ivoirien. Techniques ancestrales pour votre bien-être. Expérience unique et authentique.",
+        "category": Ad.Category.MASSAGES_SERVICES,
+        "subcategories": ["Massage Ivoirien"],
+    },
+    {
+        "title": "Service premium et personnalisé",
+        "description": "Service haut de gamme adapté à vos préférences. Discrétion absolue et professionnalisme. Contactez-moi pour plus d'informations.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Escort Girls"],
+    },
+    {
+        "title": "Massage sportif et récupération",
+        "description": "Massage spécialisé pour sportifs. Aide à la récupération musculaire et à la détente. Techniques professionnelles appliquées.",
+        "category": Ad.Category.MASSAGES_SERVICES,
+        "subcategories": ["Massage sportif"],
+    },
+    {
+        "title": "Rencontre agréable et chaleureuse",
+        "description": "Recherche rencontre sincère et agréable. Échange convivial dans un cadre respectueux. Disponible pour discuter et partager.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Cherche Homme"],
+    },
+    {
+        "title": "Massage chinois traditionnel",
+        "description": "Massage chinois avec techniques ancestrales. Équilibre énergétique et bien-être garanti. Expérience relaxante et revitalisante.",
+        "category": Ad.Category.MASSAGES_SERVICES,
+        "subcategories": ["Massage chinois"],
+    },
+    {
+        "title": "Accueil chaleureux et professionnel",
+        "description": "Service de qualité avec un accueil personnalisé. Environnement confortable et discret. Disponible selon vos disponibilités.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Escort Girls"],
+    },
+    {
+        "title": "Massage intégral et complet",
+        "description": "Massage complet du corps pour une détente totale. Techniques variées pour votre bien-être. Moment de relaxation garanti.",
+        "category": Ad.Category.MASSAGES_SERVICES,
+        "subcategories": ["Massage Intégral"],
+    },
+    {
+        "title": "Gentleman attentionné et discret",
+        "description": "Accompagnement par un gentleman courtois et attentionné. Service personnalisé selon vos besoins. Discrétion assurée.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Escort Boys"],
+    },
+    {
+        "title": "Rencontre pour moments privilégiés",
+        "description": "Recherche compagnie agréable pour partager des moments privilégiés. Échange respectueux et convivial. Disponible sur rendez-vous.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Cherche Femme"],
+    },
+    {
+        "title": "Service de qualité exceptionnelle",
+        "description": "Service haut de gamme avec attention aux détails. Professionnalisme et discrétion garantis. Expérience mémorable assurée.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Escort Girls"],
+    },
+    {
+        "title": "Massage pour votre bien-être",
+        "description": "Prenez soin de vous avec un massage adapté à vos besoins. Techniques professionnelles dans un cadre apaisant. Réservation recommandée.",
+        "category": Ad.Category.MASSAGES_SERVICES,
+        "subcategories": ["Massage Relaxant"],
+    },
+    {
+        "title": "Accompagnement pour vos événements",
+        "description": "Service d'accompagnement pour vos soirées et événements. Présence élégante et adaptée à l'occasion. Contactez-moi pour discuter.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Escort Girls"],
+    },
+    {
+        "title": "Massage sensuel et relaxant",
+        "description": "Massage sensuel pour une détente complète. Techniques douces et apaisantes. Moment de bien-être personnalisé.",
+        "category": Ad.Category.MASSAGES_SERVICES,
+        "subcategories": ["Massage sensuel ou érotique"],
+    },
+    {
+        "title": "Service discret et professionnel",
+        "description": "Service professionnel avec discrétion absolue. Respect de vos préférences et besoins. Disponibilité flexible.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Escort Girls"],
+    },
+    {
+        "title": "Rencontre sincère et respectueuse",
+        "description": "Recherche rencontre basée sur le respect et la sincérité. Échange agréable et convivial. Disponible pour discuter.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Cherche Homme"],
+    },
+    {
+        "title": "Massage thérapeutique personnalisé",
+        "description": "Massage adapté à vos besoins spécifiques. Techniques thérapeutiques pour soulager tensions et stress. Consultation préalable.",
+        "category": Ad.Category.MASSAGES_SERVICES,
+        "subcategories": ["Massage Relaxant"],
+    },
+    {
+        "title": "Accompagnement élégant et raffiné",
+        "description": "Service d'accompagnement haut de gamme. Présence élégante pour vos occasions spéciales. Professionnalisme garanti.",
+        "category": Ad.Category.RENCONTRES_ESCORTES,
+        "subcategories": ["Escort Girls"],
+    },
+]
+
 
 class Command(BaseCommand):
-    help = "Importe des annonces depuis ci.jedolo.com et crée 546 utilisateurs avec des annonces"
+    help = "Crée 100 utilisateurs avec 300 annonces au total"
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--users",
             type=int,
-            default=546,
-            help="Nombre d'utilisateurs à créer (défaut: 546)",
+            default=100,
+            help="Nombre d'utilisateurs à créer (défaut: 100)",
         )
         parser.add_argument(
-            "--ads-per-user",
+            "--ads",
             type=int,
-            default=2,
-            help="Nombre minimum d'annonces par utilisateur (défaut: 2)",
-        )
-        parser.add_argument(
-            "--max-ads",
-            type=int,
-            default=5,
-            help="Nombre maximum d'annonces par utilisateur (défaut: 5)",
+            default=300,
+            help="Nombre total d'annonces à créer (défaut: 300)",
         )
 
     def handle(self, *args, **options):
-        if BeautifulSoup is None:
-            self.stdout.write(
-                self.style.ERROR("BeautifulSoup4 n'est pas installé. Installez-le avec: pip install beautifulsoup4")
-            )
-            return
-
         num_users = options["users"]
-        min_ads = options["ads_per_user"]
-        max_ads = options["max_ads"]
-
+        total_ads = options["ads"]
+        
         self.stdout.write(
             self.style.SUCCESS(
-                f"Début de l'import: {num_users} utilisateurs, {min_ads}-{max_ads} annonces par utilisateur"
+                f"Début de l'import: {num_users} utilisateurs, {total_ads} annonces au total"
             )
         )
 
         # Récupérer ou créer les villes
         cities = self.get_or_create_cities()
 
-        # Scraper les annonces depuis ci.jedolo.com
-        self.stdout.write("Scraping des annonces depuis ci.jedolo.com...")
-        scraped_ads = self.scrape_jedolo_ads()
-
-        if not scraped_ads:
-            self.stdout.write(
-                self.style.WARNING("Aucune annonce scrapée. Création d'annonces fictives...")
-            )
-            scraped_ads = self.generate_fake_ads(cities)
-
         # Créer les utilisateurs et annonces
-        self.create_users_and_ads(num_users, min_ads, max_ads, scraped_ads, cities)
+        self.create_users_and_ads(num_users, total_ads, cities)
 
         self.stdout.write(self.style.SUCCESS("Import terminé avec succès!"))
 
@@ -126,208 +218,8 @@ class Command(BaseCommand):
             cities.append(city)
         return cities
 
-    def scrape_jedolo_ads(self, max_pages=10):
-        """Scrape les annonces depuis ci.jedolo.com"""
-        scraped_ads = []
-        base_url = "https://ci.jedolo.com"
-        
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Connection": "keep-alive",
-            "Upgrade-Insecure-Requests": "1",
-        }
-
-        try:
-            # Essayer de scraper la page d'accueil et les pages de liste
-            for page in range(1, max_pages + 1):
-                if page == 1:
-                    url = f"{base_url}/"
-                else:
-                    url = f"{base_url}/?page={page}"
-
-                try:
-                    response = requests.get(url, headers=headers, timeout=10)
-                    response.raise_for_status()
-                    
-                    soup = BeautifulSoup(response.content, "html.parser")
-                    
-                    # Chercher les liens vers les annonces individuelles
-                    ad_links = soup.find_all("a", href=re.compile(r"/annonce/|/ad/|/detail/"))
-                    
-                    for link in ad_links[:20]:  # Limiter à 20 annonces par page
-                        ad_url = urljoin(base_url, link.get("href", ""))
-                        ad_data = self.scrape_ad_detail(ad_url, headers)
-                        if ad_data:
-                            scraped_ads.append(ad_data)
-                            
-                    if not ad_links:
-                        break
-                        
-                except Exception as e:
-                    self.stdout.write(
-                        self.style.WARNING(f"Erreur lors du scraping de la page {page}: {str(e)}")
-                    )
-                    break
-
-        except Exception as e:
-            self.stdout.write(
-                self.style.WARNING(f"Erreur lors du scraping: {str(e)}")
-            )
-
-        self.stdout.write(f"  → {len(scraped_ads)} annonces scrapées")
-        return scraped_ads
-
-    def scrape_ad_detail(self, url, headers):
-        """Scrape les détails d'une annonce"""
-        try:
-            response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()
-            
-            soup = BeautifulSoup(response.content, "html.parser")
-            
-            # Extraire le titre
-            title_elem = soup.find("h1") or soup.find("title")
-            title = title_elem.get_text(strip=True) if title_elem else "Annonce"
-            
-            # Extraire la description
-            desc_elem = soup.find("div", class_=re.compile(r"description|content|text"))
-            if not desc_elem:
-                desc_elem = soup.find("p")
-            description = desc_elem.get_text(strip=True) if desc_elem else "Description de l'annonce"
-            
-            # Extraire les images
-            images = []
-            img_tags = soup.find_all("img", src=re.compile(r"\.(jpg|jpeg|png|webp)", re.I))
-            for img in img_tags[:5]:  # Maximum 5 images
-                img_url = img.get("src") or img.get("data-src")
-                if img_url:
-                    img_url = urljoin(url, img_url)
-                    # Filtrer les logos et images système
-                    if not any(x in img_url.lower() for x in ["logo", "icon", "avatar", "default"]):
-                        images.append(img_url)
-            
-            # Déterminer la catégorie basée sur le titre/description
-            category = self.determine_category(title, description)
-            subcategories = self.determine_subcategories(title, description)
-            
-            return {
-                "title": title[:140],
-                "description": description[:2000],
-                "category": category,
-                "subcategories": subcategories,
-                "images": images,
-            }
-            
-        except Exception as e:
-            self.stdout.write(
-                self.style.WARNING(f"Erreur lors du scraping de {url}: {str(e)}")
-            )
-            return None
-
-    def determine_category(self, title, description):
-        """Détermine la catégorie basée sur le titre et la description"""
-        text = (title + " " + description).lower()
-        
-        if any(word in text for word in ["massage", "relaxant", "sportif", "chinois", "ivoirien"]):
-            return Ad.Category.MASSAGES_SERVICES
-        elif any(word in text for word in ["sextoy", "jouet", "lubrifiant", "aphrodisiaque", "parfum"]):
-            return Ad.Category.PRODUITS_ADULTES
-        else:
-            return Ad.Category.RENCONTRES_ESCORTES
-
-    def determine_subcategories(self, title, description):
-        """Détermine les sous-catégories"""
-        text = (title + " " + description).lower()
-        subcats = []
-        
-        subcategory_mapping = {
-            "massage sensuel": "Massage sensuel ou érotique",
-            "massage ivoirien": "Massage Ivoirien",
-            "massage relaxant": "Massage Relaxant",
-            "massage sportif": "Massage sportif",
-            "massage chinois": "Massage chinois",
-            "massage intégral": "Massage Intégral",
-            "sextoy": "Sextoy - Jouet Sexuel",
-            "jouet": "Sextoy - Jouet Sexuel",
-            "lubrifiant": "Lubrifiants – Huiles",
-            "aphrodisiaque homme": "Aphrodisiaques homme",
-            "aphrodisiaque femme": "Aphrodisiaques Femme",
-            "parfum": "Parfums adultes",
-            "cherche homme": "Cherche Homme",
-            "cherche femme": "Cherche Femme",
-            "escort": "Escort Girls",
-        }
-        
-        for keyword, subcat in subcategory_mapping.items():
-            if keyword in text and subcat not in subcats:
-                subcats.append(subcat)
-                if len(subcats) >= 3:  # Maximum 3 sous-catégories
-                    break
-        
-        return subcats if subcats else ["Escort Girls"]
-
-    def generate_fake_ads(self, cities):
-        """Génère des annonces fictives si le scraping échoue"""
-        fake_ads = []
-        
-        titles = [
-            "Belle jeune femme disponible",
-            "Massage relaxant professionnel",
-            "Service de qualité et discret",
-            "Accompagnement élégant",
-            "Massage thérapeutique",
-            "Rencontre agréable",
-            "Service premium",
-            "Accueil chaleureux",
-        ]
-        
-        descriptions = [
-            "Service de qualité avec professionnalisme et discrétion. Disponible pour vous satisfaire.",
-            "Massage relaxant dans un cadre agréable. Expérience inoubliable garantie.",
-            "Accompagnement élégant et discret. Disponible selon vos besoins.",
-            "Service professionnel avec une approche personnalisée. Contactez-moi pour plus d'informations.",
-        ]
-        
-        for i in range(100):  # Générer 100 annonces fictives
-            fake_ads.append({
-                "title": random.choice(titles) + f" {i+1}",
-                "description": random.choice(descriptions),
-                "category": random.choice(list(Ad.Category.choices))[0],
-                "subcategories": random.sample(Ad.SUBCATEGORY_CHOICES, min(2, len(Ad.SUBCATEGORY_CHOICES))),
-                "images": [],
-            })
-        
-        return fake_ads
-
-    def download_image(self, url, headers):
-        """Télécharge une image depuis une URL"""
-        try:
-            response = requests.get(url, headers=headers, timeout=10, stream=True)
-            response.raise_for_status()
-            
-            # Vérifier que c'est bien une image
-            content_type = response.headers.get("content-type", "")
-            if not content_type.startswith("image/"):
-                return None
-            
-            # Limiter la taille à 5MB
-            content = response.content
-            if len(content) > 5 * 1024 * 1024:
-                return None
-            
-            return content
-            
-        except Exception as e:
-            self.stdout.write(
-                self.style.WARNING(f"Erreur lors du téléchargement de {url}: {str(e)}")
-            )
-            return None
-
     def create_fake_image(self):
-        """Crée une image fictive si le téléchargement échoue"""
+        """Crée une image fictive"""
         if Image is None:
             return None
         
@@ -353,14 +245,10 @@ class Command(BaseCommand):
         return username
 
     @transaction.atomic
-    def create_users_and_ads(self, num_users, min_ads, max_ads, scraped_ads, cities):
+    def create_users_and_ads(self, num_users, total_ads, cities):
         """Crée les utilisateurs et leurs annonces"""
         from django.db.models.signals import post_save
         from accounts.signals import on_user_saved
-        
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }
         
         created_users = 0
         created_ads = 0
@@ -369,12 +257,13 @@ class Command(BaseCommand):
         post_save.disconnect(on_user_saved, sender=User)
         
         try:
-            # Réutiliser les annonces scrapées
-            if scraped_ads:
-                ad_pool = scraped_ads * ((num_users * max_ads) // len(scraped_ads) + 1)
-                random.shuffle(ad_pool)
-            else:
-                ad_pool = []
+            # Calculer le nombre d'annonces par utilisateur
+            ads_per_user = total_ads // num_users
+            extra_ads = total_ads % num_users
+            
+            # Préparer le pool d'annonces
+            ad_pool = ANNOUNCE_DATA * ((total_ads // len(ANNOUNCE_DATA)) + 1)
+            random.shuffle(ad_pool)
             ad_index = 0
             
             for i in range(num_users):
@@ -394,91 +283,59 @@ class Command(BaseCommand):
                 )
                 user.set_password("password123")
                 user.save()
-            
-            # Créer le profil
-            profile = Profile.objects.get(user=user)
-            profile.display_name = f"{random.choice(FIRST_NAMES)} {random.choice(IVOIRIAN_NAMES)}"
-            profile.city = random.choice(cities)
-            profile.country = "CI"
-            profile.contact_prefs = random.sample(["sms", "whatsapp", "call"], random.randint(1, 3))
-            profile.bio_sanitized = "Profil créé automatiquement"
-            profile.save()
-            
-            created_users += 1
-            
-            # Créer les annonces pour cet utilisateur
-            num_user_ads = random.randint(min_ads, max_ads)
-            
-            for j in range(num_user_ads):
-                if ad_index >= len(ad_pool):
-                    # Générer une annonce fictive si on a épuisé le pool
-                    ad_data = {
-                        "title": f"Annonce {i+1}-{j+1}",
-                        "description": "Description de l'annonce",
-                        "category": random.choice(list(Ad.Category.choices))[0],
-                        "subcategories": random.sample(Ad.SUBCATEGORY_CHOICES, min(2, len(Ad.SUBCATEGORY_CHOICES))),
-                        "images": [],
-                    }
-                else:
+                
+                # Créer le profil
+                profile = Profile.objects.get(user=user)
+                profile.display_name = f"{random.choice(FIRST_NAMES)} {random.choice(IVOIRIAN_NAMES)}"
+                profile.city = random.choice(cities)
+                profile.country = "CI"
+                profile.contact_prefs = random.sample(["sms", "whatsapp", "call"], random.randint(1, 3))
+                profile.bio_sanitized = "Profil créé automatiquement"
+                profile.save()
+                
+                created_users += 1
+                
+                # Calculer le nombre d'annonces pour cet utilisateur
+                num_user_ads = ads_per_user + (1 if i < extra_ads else 0)
+                
+                # Créer les annonces pour cet utilisateur
+                for j in range(num_user_ads):
+                    if ad_index >= len(ad_pool):
+                        # Réutiliser le pool si nécessaire
+                        ad_index = 0
+                        random.shuffle(ad_pool)
+                    
                     ad_data = ad_pool[ad_index].copy()
                     ad_index += 1
-                
-                # Sanitizer la description
-                description = bleach.clean(
-                    ad_data["description"],
-                    tags=[],
-                    attributes={},
-                    strip=True,
-                )
-                
-                # Créer l'annonce
-                ad = Ad.objects.create(
-                    user=user,
-                    title=ad_data["title"][:140],
-                    description_sanitized=description[:2000],
-                    category=ad_data["category"],
-                    subcategories=ad_data["subcategories"][:3],  # Maximum 3
-                    city=random.choice(cities),
-                    area=random.choice(["Cocody", "Yopougon", "Marcory", "Plateau", "Abobo", ""]),
-                    status=Ad.Status.APPROVED,
-                    is_verified=random.choice([True, False]),
-                    expires_at=timezone.now() + timezone.timedelta(days=random.randint(14, 30)),
-                )
-                
-                # Ajouter les images
-                images_added = 0
-                max_images = min(5, len(ad_data.get("images", [])))
-                
-                for img_url in ad_data.get("images", [])[:max_images]:
-                    if images_added >= 5:
-                        break
                     
-                    img_content = self.download_image(img_url, headers)
+                    # Varier légèrement le titre pour éviter les doublons
+                    title = ad_data["title"]
+                    if j > 0:
+                        title = f"{title} {j+1}"
                     
-                    if not img_content:
-                        img_content = self.create_fake_image()
+                    # Sanitizer la description
+                    description = bleach.clean(
+                        ad_data["description"],
+                        tags=[],
+                        attributes={},
+                        strip=True,
+                    )
                     
-                    if img_content:
-                        try:
-                            ext = "jpg"
-                            if img_url:
-                                parsed = urlparse(img_url)
-                                ext = os.path.splitext(parsed.path)[1][1:] or "jpg"
-                            
-                            filename = f"ad_{ad.id}_{images_added+1}.{ext}"
-                            AdMedia.objects.create(
-                                ad=ad,
-                                image=ContentFile(img_content, name=filename),
-                                is_primary=(images_added == 0),
-                            )
-                            images_added += 1
-                        except Exception as e:
-                            self.stdout.write(
-                                self.style.WARNING(f"Erreur lors de l'ajout de l'image: {str(e)}")
-                            )
-                
-                # Si aucune image n'a été ajoutée, créer une image fictive
-                if images_added == 0:
+                    # Créer l'annonce
+                    ad = Ad.objects.create(
+                        user=user,
+                        title=title[:140],
+                        description_sanitized=description[:2000],
+                        category=ad_data["category"],
+                        subcategories=ad_data["subcategories"][:3],
+                        city=random.choice(cities),
+                        area=random.choice(["Cocody", "Yopougon", "Marcory", "Plateau", "Abobo", ""]),
+                        status=Ad.Status.APPROVED,
+                        is_verified=random.choice([True, False]),
+                        expires_at=timezone.now() + timezone.timedelta(days=random.randint(14, 30)),
+                    )
+                    
+                    # Ajouter une image fictive
                     img_content = self.create_fake_image()
                     if img_content:
                         try:
@@ -489,14 +346,14 @@ class Command(BaseCommand):
                             )
                         except Exception:
                             pass
+                    
+                    created_ads += 1
+                    
+                    if created_ads % 50 == 0:
+                        self.stdout.write(f"  → {created_ads} annonces créées...")
                 
-                created_ads += 1
-                
-                if created_ads % 50 == 0:
-                    self.stdout.write(f"  → {created_ads} annonces créées...")
-            
-            if created_users % 50 == 0:
-                self.stdout.write(f"  → {created_users} utilisateurs créés...")
+                if created_users % 25 == 0:
+                    self.stdout.write(f"  → {created_users} utilisateurs créés...")
         
         finally:
             # Réactiver le signal d'envoi d'email
@@ -509,4 +366,3 @@ class Command(BaseCommand):
                 f"  - {created_ads} annonces créées\n"
             )
         )
-
