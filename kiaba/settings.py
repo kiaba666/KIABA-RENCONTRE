@@ -227,25 +227,19 @@ else:
     }
 
     if is_render_db:
-        # Sur Render, utiliser le host INTERNE (avec -a) pour les connexions internes
-        # Vérifier si le host contient déjà -a.oregon-postgres.render.com
-        if "-a.oregon-postgres.render.com" not in postgres_host and postgres_host.endswith(".oregon-postgres.render.com"):
-            # C'est le host externe, on doit utiliser le host interne pour les connexions internes
-            # Sur Render, les services web peuvent se connecter via le host interne
-            # Construire le host interne en ajoutant -a avant .oregon-postgres.render.com
-            postgres_host = postgres_host.replace(".oregon-postgres.render.com", "-a.oregon-postgres.render.com")
+        # Sur Render, PostgreSQL exige TOUJOURS SSL/TLS, même pour les connexions internes
+        # Utiliser le host externe (sans -a) avec sslmode=require
+        # Ne pas convertir en host interne car SSL est requis dans tous les cas
         
-        # Si le host contient -a.oregon-postgres.render.com, c'est le host INTERNE de Render
-        # Note: Même le host interne peut nécessiter SSL selon la configuration Render
-        if "-a.oregon-postgres.render.com" in postgres_host:
-            # Host interne : utiliser 'prefer' qui essaie SSL mais accepte non-SSL si SSL échoue
-            # Si le serveur exige SSL, 'prefer' utilisera SSL
-            db_options["sslmode"] = "prefer"
-            os.environ["PGSSLMODE"] = "prefer"
-        else:
-            # Host externe : forcer SSL
-            db_options["sslmode"] = "require"
-            os.environ["PGSSLMODE"] = "require"
+        # Si le host se termine par -a, c'est le host interne - le convertir en externe
+        if postgres_host.endswith("-a.oregon-postgres.render.com"):
+            # Convertir le host interne en host externe
+            postgres_host = postgres_host.replace("-a.oregon-postgres.render.com", ".oregon-postgres.render.com")
+        
+        # Render PostgreSQL exige SSL pour toutes les connexions
+        # Utiliser 'require' qui force SSL sans vérification du certificat
+        db_options["sslmode"] = "require"
+        os.environ["PGSSLMODE"] = "require"
 
     DATABASES = {
         "default": {
