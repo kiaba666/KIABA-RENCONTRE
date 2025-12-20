@@ -149,23 +149,26 @@ class NoRateLimitAccountAdapter(DefaultAccountAdapter):
 
     def get_login_redirect_url(self, request):
         """Redirection après connexion"""
+        # Vérifier que l'utilisateur est authentifié
+        if not request.user or not request.user.is_authenticated:
+            return "/auth/login/"
+        
         # Marquer le profil comme vérifié après la première connexion
         try:
-            if hasattr(request.user, 'profile'):
+            from .models import Profile
+            try:
                 profile = request.user.profile
                 if not profile.is_verified:
                     profile.is_verified = True
                     profile.save()
                     logger.info(f"Profil de {request.user.username} marqué comme vérifié")
-            else:
+            except Profile.DoesNotExist:
                 # Créer le profil s'il n'existe pas
-                from .models import Profile
-                profile, created = Profile.objects.get_or_create(
+                profile = Profile.objects.create(
                     user=request.user,
-                    defaults={"display_name": request.user.username}
+                    display_name=request.user.username
                 )
-                if created:
-                    logger.info(f"Profil créé pour {request.user.username}")
+                logger.info(f"Profil créé pour {request.user.username}")
         except Exception as e:
             logger.error(f"Erreur lors de la gestion du profil: {e}", exc_info=True)
 
