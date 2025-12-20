@@ -58,6 +58,12 @@ if environ is not None:
         EMAIL_HOST_PASSWORD=(str, ""),
         DEFAULT_FROM_EMAIL=(str, "KIABA <no-reply@example.com>"),
         SERVER_EMAIL=(str, "KIABA Errors <errors@example.com>"),
+        # CinetPay
+        CINETPAY_SITE_ID=(str, ""),
+        CINETPAY_API_KEY=(str, ""),
+        CINETPAY_SITE_KEY=(str, ""),
+        CINETPAY_NOTIFY_URL=(str, "https://ci-kiaba.com/accounts/payment/cinetpay/notify/"),
+        CINETPAY_RETURN_URL=(str, "https://ci-kiaba.com/accounts/payment/cinetpay/return/"),
     )
     environ.Env.read_env(os.path.join(Path(__file__).resolve().parent.parent, ".env"))
 else:
@@ -105,6 +111,12 @@ else:
         EMAIL_HOST_PASSWORD=(str, ""),
         DEFAULT_FROM_EMAIL=(str, "KIABA <no-reply@example.com>"),
         SERVER_EMAIL=(str, "KIABA Errors <errors@example.com>"),
+        # CinetPay
+        CINETPAY_SITE_ID=(str, ""),
+        CINETPAY_API_KEY=(str, ""),
+        CINETPAY_SITE_KEY=(str, ""),
+        CINETPAY_NOTIFY_URL=(str, "https://ci-kiaba.com/accounts/payment/cinetpay/notify/"),
+        CINETPAY_RETURN_URL=(str, "https://ci-kiaba.com/accounts/payment/cinetpay/return/"),
     )
 
 # Quick-start development settings - unsuitable for production

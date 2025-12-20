@@ -234,7 +234,11 @@ def dashboard(request: HttpRequest) -> HttpResponse:
     if not request.user.is_authenticated:
         return redirect("/auth/login/")
     my_ads = Ad.objects.filter(user=request.user).order_by("-created_at")[:50]
-    return render(request, "core/dashboard.html", {"ads": my_ads})
+    # Récupérer le compte si existe
+    account = None
+    if hasattr(request.user, 'account'):
+        account = request.user.account
+    return render(request, "core/dashboard.html", {"ads": my_ads, "account": account})
 
 
 # Pages légales

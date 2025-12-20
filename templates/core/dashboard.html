@@ -8,6 +8,34 @@
     <p class="text-gray-600 mt-1">Gérez vos informations et vos annonces.</p>
   </section>
 
+  <!-- Solde et crédits -->
+  {% if user.account %}
+  <section class="bg-white rounded-2xl p-4 md:p-6 border shadow-sm">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Mon compte</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+      <div class="bg-blue-50 p-3 rounded-lg">
+        <p class="text-xs text-gray-600">Solde</p>
+        <p class="text-xl font-bold text-blue-600">{{ user.account.balance|floatformat:0 }} FCFA</p>
+      </div>
+      <div class="bg-green-50 p-3 rounded-lg">
+        <p class="text-xs text-gray-600">Annonces gratuites</p>
+        <p class="text-xl font-bold text-green-600">{{ user.account.free_ads_remaining }}</p>
+      </div>
+      <div class="bg-purple-50 p-3 rounded-lg">
+        <p class="text-xs text-gray-600">Annonces pack</p>
+        <p class="text-xl font-bold text-purple-600">{{ user.account.ads_remaining }}</p>
+      </div>
+      <div class="bg-yellow-50 p-3 rounded-lg">
+        <p class="text-xs text-gray-600">Boosters gratuits</p>
+        <p class="text-xl font-bold text-yellow-600">{{ user.account.free_boosters_remaining }}</p>
+      </div>
+    </div>
+    <a href="{% url 'accounts:account_balance' %}" class="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition font-medium inline-block">
+      Gérer mon compte
+    </a>
+  </section>
+  {% endif %}
+
   <!-- Informations du profil -->
   <section class="bg-white rounded-2xl p-4 md:p-6 border shadow-sm">
     <h2 class="text-lg font-semibold text-gray-900 mb-4">Informations du profil</h2>
@@ -64,11 +92,18 @@
                   <span class="{% if ad.status == 'approved' %}text-green-600{% elif ad.status == 'pending' %}text-yellow-600{% elif ad.status == 'rejected' %}text-red-600{% endif %}">
                     {{ ad.get_status_display }}
                   </span>
+                  {% if ad.is_premium %}<span class="ml-2 text-yellow-600">⭐ Premium</span>{% endif %}
+                  {% if ad.is_urgent %}<span class="ml-2 text-red-600">🚨 Urgent</span>{% endif %}
                 </p>
               </div>
               <div class="flex items-center gap-2 ml-4">
                 <a href="/ads/{{ ad.slug }}/" class="text-blue-600 hover:text-blue-800 text-sm">Voir</a>
                 <a href="/edit/{{ ad.id }}/" class="text-gray-600 hover:text-gray-800 text-sm">Modifier</a>
+                {% if ad.status == 'approved' %}
+                <a href="{% url 'accounts:boost_ad' ad.id %}" class="bg-pink-600 text-white px-3 py-1 rounded text-sm hover:bg-pink-700 transition">
+                  Booster
+                </a>
+                {% endif %}
               </div>
             </div>
           </div>
