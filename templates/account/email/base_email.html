@@ -8,112 +8,266 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #333333;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        .email-wrapper {
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .email-container {
             background-color: #ffffff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .email-header {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            padding: 30px 20px;
+            padding: 40px 20px 20px 20px;
             text-align: center;
         }
-        .email-header h1 {
-            margin: 0;
-            font-size: 28px;
+        .logo {
+            max-width: 120px;
+            height: auto;
+            margin: 0 auto 20px;
+            display: block;
+        }
+        .email-content {
+            padding: 0 40px 40px 40px;
+        }
+        .greeting {
+            color: #666666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .main-title {
+            font-size: 24px;
             font-weight: 700;
-        }
-        .email-body {
-            padding: 30px 20px;
-        }
-        .email-footer {
-            background-color: #f9fafb;
-            padding: 20px;
+            color: #000000;
+            margin: 0 0 20px 0;
             text-align: center;
-            font-size: 12px;
-            color: #6b7280;
-            border-top: 1px solid #e5e7eb;
+        }
+        .code-box {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .code {
+            font-size: 32px;
+            font-weight: 700;
+            color: #000000;
+            letter-spacing: 4px;
+            margin: 10px 0;
+        }
+        .security-note {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .security-note strong {
+            color: #000000;
         }
         .button {
             display: inline-block;
-            padding: 12px 24px;
-            background-color: #3b82f6;
-            color: white;
+            padding: 14px 32px;
+            background-color: #007bff;
+            color: #ffffff;
             text-decoration: none;
             border-radius: 6px;
             font-weight: 600;
-            margin: 20px 0;
+            font-size: 16px;
+            margin: 25px 0;
+            text-align: center;
         }
         .button:hover {
-            background-color: #2563eb;
+            background-color: #0056b3;
+        }
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
         }
         .info-box {
-            background-color: #eff6ff;
-            border-left: 4px solid #3b82f6;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 25px 0;
         }
-        .warning-box {
-            background-color: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
+        .info-box h3 {
+            margin-top: 0;
+            color: #000000;
+            font-size: 18px;
+            font-weight: 600;
         }
         .details {
-            background-color: #f9fafb;
-            padding: 15px;
+            background-color: #f8f9fa;
+            padding: 20px;
             border-radius: 6px;
-            margin: 20px 0;
+            margin: 25px 0;
         }
         .details dt {
             font-weight: 600;
-            margin-top: 10px;
+            margin-top: 12px;
+            color: #000000;
         }
         .details dd {
             margin-left: 0;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            color: #666666;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .footer-logo {
+            text-align: center;
+            padding: 30px 0 20px 0;
+        }
+        .footer-logo img {
+            max-width: 100px;
+            height: auto;
+        }
+        .footer-separator {
+            border-top: 1px solid #e9ecef;
+            margin: 20px 0;
+        }
+        .footer-links {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 14px;
+        }
+        .footer-links a {
+            color: #007bff;
+            text-decoration: none;
+            padding: 0 10px;
+            border-right: 1px solid #e9ecef;
+        }
+        .footer-links a:last-child {
+            border-right: none;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        .social-icons {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .social-icon {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background-color: #6c757d;
+            border-radius: 50%;
+            margin: 0 8px;
+            text-align: center;
+            line-height: 32px;
+            color: #ffffff;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .footer-text {
+            padding: 20px 40px;
+            font-size: 12px;
+            color: #666666;
+            line-height: 1.6;
+        }
+        .footer-text a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+        .footer-text strong {
+            color: #000000;
+        }
+        p {
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333333;
+        }
+        ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin: 8px 0;
+            font-size: 14px;
         }
         a {
-            color: #3b82f6;
+            color: #007bff;
             text-decoration: none;
         }
         a:hover {
             text-decoration: underline;
         }
+        .link-text {
+            word-break: break-all;
+            color: #666666;
+            font-size: 12px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
-    <div class="email-container">
+    <div class="email-wrapper">
+        <!-- Header avec logo -->
         <div class="email-header">
-            <img src="https://ci-kiaba.com/static/img/logo.png" alt="KIABA" style="max-width: 200px; height: auto; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto;" />
-            <h1 style="margin: 0; font-size: 28px; font-weight: 700;">KIABA</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Plateforme de rencontres et petites annonces</p>
+            <img src="https://ci-kiaba.com/static/img/logo.png" alt="KIABA" class="logo" />
         </div>
-        
-        <div class="email-body">
+
+        <!-- Contenu principal -->
+        <div class="email-content">
+            {% block email_greeting %}
+            <p class="greeting">Bonjour <strong>{{ user.get_full_name|default:user.username }}</strong>,</p>
+            {% endblock %}
+
             {% block email_content %}{% endblock %}
         </div>
-        
-        <div class="email-footer">
-            <p><strong>KIABA</strong> - Site de rencontres et petites annonces adultes en Côte d'Ivoire</p>
-            <p>Email: <a href="mailto:support@ci-kiaba.com" style="color: #3b82f6;">support@ci-kiaba.com</a></p>
-            <p>Site web: <a href="https://ci-kiaba.com" style="color: #3b82f6;">ci-kiaba.com</a></p>
-            <p style="margin-top: 15px; font-size: 11px; color: #9ca3af;">
-                Cet email a été envoyé automatiquement. Merci de ne pas y répondre directement.<br>
-                Si vous avez des questions, contactez-nous à support@ci-kiaba.com
+
+        <!-- Footer avec logo -->
+        <div class="footer-logo">
+            <img src="https://ci-kiaba.com/static/img/logo.png" alt="KIABA" class="logo" />
+        </div>
+
+        <!-- Séparateur -->
+        <div class="footer-separator"></div>
+
+        <!-- Liens footer -->
+        <div class="footer-links">
+            <a href="https://ci-kiaba.com/help/">Aide et Contact</a>
+            <a href="https://ci-kiaba.com/security/">Sécurité</a>
+            <a href="https://ci-kiaba.com/">Application</a>
+        </div>
+
+        <!-- Icônes réseaux sociaux -->
+        <div class="social-icons">
+            <a href="#" class="social-icon" style="background-color: #1da1f2;">𝕏</a>
+            <a href="#" class="social-icon" style="background-color: #e4405f;">📷</a>
+            <a href="#" class="social-icon" style="background-color: #1877f2;">f</a>
+            <a href="#" class="social-icon" style="background-color: #0077b5;">in</a>
+        </div>
+
+        <!-- Texte footer -->
+        <div class="footer-text">
+            <p style="margin: 0 0 15px 0;">
+                Nous nous engageons à lutter contre l'envoi d'emails frauduleux. Les emails <strong>KIABA</strong> contiennent toujours votre nom complet. 
+                <a href="https://ci-kiaba.com/security/phishing">Apprenez à reconnaître les tentatives de phishing</a>.
+            </p>
+            <p style="margin: 0 0 15px 0;">
+                Merci de ne pas répondre à cet email. Pour nous contacter, cliquez sur <a href="https://ci-kiaba.com/help/">Aide et Contact</a>.
+            </p>
+            <p style="margin: 0;">
+                Vous ne savez pas pourquoi vous avez reçu cet email ? <a href="https://ci-kiaba.com/help/email">En savoir plus</a>
             </p>
         </div>
     </div>
 </body>
 </html>
-

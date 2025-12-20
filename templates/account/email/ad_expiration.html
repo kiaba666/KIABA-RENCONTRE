@@ -3,12 +3,12 @@
 {% block email_title %}Votre annonce a expiré - KIABA{% endblock %}
 
 {% block email_content %}
-<p>Bonjour <strong>{{ user.username }}</strong>,</p>
+<h1 class="main-title">Votre annonce a expiré</h1>
 
 <p>Votre annonce a expiré et n'est plus visible sur KIABA.</p>
 
 <div class="details">
-    <h3 style="margin-top: 0;">Détails de l'annonce expirée :</h3>
+    <h3>Détails de l'annonce expirée :</h3>
     <dl>
         <dt>Titre :</dt>
         <dd>{{ ad.title }}</dd>
@@ -25,22 +25,18 @@
 </div>
 
 <div class="info-box">
-    <h3 style="margin-top: 0; color: #1e40af;">💡 Que faire maintenant ?</h3>
+    <h3>💡 Que faire maintenant ?</h3>
     <p style="margin-bottom: 0;">Pour republier cette annonce ou en créer une nouvelle, cliquez sur le bouton ci-dessous.</p>
 </div>
 
-<div style="text-align: center; margin: 30px 0;">
+<div class="button-container">
     <a href="{{ site_url }}/post/" class="button">Créer une nouvelle annonce</a>
 </div>
 
-<p>Pour gérer toutes vos annonces :</p>
-<p style="text-align: center;">
-    <a href="{{ site_url }}/dashboard/" style="color: #3b82f6; font-weight: 600;">Accéder à mon tableau de bord</a>
+<p style="text-align: center; margin-top: 25px;">
+    <a href="{{ site_url }}/dashboard/">Accéder à mon tableau de bord</a>
 </p>
 
-<p><strong>Conseil :</strong> Pour éviter l'expiration, pensez à renouveler vos annonces régulièrement.</p>
-
-<p>Cordialement,<br>
-<strong>L'équipe KIABA</strong></p>
+<p style="font-size: 13px; color: #666666;"><strong>Conseil :</strong> Pour éviter l'expiration, pensez à renouveler vos annonces régulièrement.</p>
 {% endblock %}
 

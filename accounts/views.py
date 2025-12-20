@@ -74,23 +74,18 @@ def password_change(request: HttpRequest) -> HttpResponse:
             from django.core.mail import send_mail
             from django.conf import settings
 
-            # Utiliser le nouveau service d'email
+            # Utiliser le nouveau service d'email avec template
             from .email_service import EmailService
+            from django.conf import settings
             EmailService.send_email(
-                subject="Code de confirmation pour changement de mot de passe",
+                subject="Code de confirmation pour changement de mot de passe - KIABA",
                 to_emails=[request.user.email],
-                text_content=f"""Bonjour {request.user.username},
-
-Vous avez demandé à changer votre mot de passe sur KIABA.
-
-Votre code de confirmation est : {otp.code}
-
-Ce code est valide pendant 10 minutes.
-
-Si vous n'avez pas demandé ce changement, veuillez ignorer cet email ou nous contacter à support@ci-kiaba.com
-
-Cordialement,
-L'équipe KIABA""",
+                template_name="account/email/password_change_otp",
+                context={
+                    "user": request.user,
+                    "code": otp.code,
+                    "site_url": getattr(settings, "SITE_URL", "https://ci-kiaba.com"),
+                },
                 fail_silently=False,
             )
             # Log dev
@@ -148,23 +143,18 @@ def resend_password_change_code(request: HttpRequest) -> HttpResponse:
         req_form = PasswordChangeOTPRequestForm(request.POST or None, user=request.user)
         otp = req_form.save()
         
-        # Utiliser le nouveau service d'email
+        # Utiliser le nouveau service d'email avec template
         from .email_service import EmailService
+        from django.conf import settings
         EmailService.send_email(
-            subject="Code de confirmation pour changement de mot de passe",
+            subject="Code de confirmation pour changement de mot de passe - KIABA",
             to_emails=[request.user.email],
-            text_content=f"""Bonjour {request.user.username},
-
-Vous avez demandé un nouveau code de confirmation pour changer votre mot de passe sur KIABA.
-
-Votre code de confirmation est : {otp.code}
-
-Ce code est valide pendant 10 minutes.
-
-Si vous n'avez pas demandé ce changement, veuillez ignorer cet email ou nous contacter à support@ci-kiaba.com
-
-Cordialement,
-L'équipe KIABA""",
+            template_name="account/email/password_change_otp",
+            context={
+                "user": request.user,
+                "code": otp.code,
+                "site_url": getattr(settings, "SITE_URL", "https://ci-kiaba.com"),
+            },
             fail_silently=False,
         )
         messages.info(request, "Nouveau code envoyé par email.")

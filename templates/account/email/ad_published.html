@@ -3,17 +3,17 @@
 {% block email_title %}Votre annonce est en ligne - KIABA{% endblock %}
 
 {% block email_content %}
-<p>Bonjour <strong>{{ user.username }}</strong>,</p>
+<h1 class="main-title">Votre annonce est en ligne !</h1>
 
 <p>Félicitations ! Votre annonce a été publiée avec succès sur KIABA et est maintenant visible par tous les visiteurs.</p>
 
 <div class="info-box">
-    <h3 style="margin-top: 0; color: #1e40af;">Votre annonce est en ligne !</h3>
-    <p style="margin-bottom: 0;">Les visiteurs peuvent maintenant la consulter et vous contacter.</p>
+    <h3>Publication réussie</h3>
+    <p style="margin-bottom: 0;">Les visiteurs peuvent maintenant consulter votre annonce et vous contacter.</p>
 </div>
 
 <div class="details">
-    <h3 style="margin-top: 0;">Détails de votre annonce :</h3>
+    <h3>Détails de votre annonce :</h3>
     <dl>
         <dt>Titre :</dt>
         <dd>{{ ad.title }}</dd>
@@ -32,18 +32,14 @@
     </dl>
 </div>
 
-<div style="text-align: center; margin: 30px 0;">
+<div class="button-container">
     <a href="{{ ad_url }}" class="button">Voir mon annonce</a>
 </div>
 
-<p>Pour gérer toutes vos annonces, rendez-vous sur votre tableau de bord :</p>
-<p style="text-align: center;">
-    <a href="{{ site_url }}/dashboard/" style="color: #3b82f6; font-weight: 600;">Accéder à mon tableau de bord</a>
+<p style="text-align: center; margin-top: 25px;">
+    <a href="{{ site_url }}/dashboard/">Accéder à mon tableau de bord</a>
 </p>
 
-<p>Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter à <a href="mailto:support@ci-kiaba.com">support@ci-kiaba.com</a>.</p>
-
-<p>Cordialement,<br>
-<strong>L'équipe KIABA</strong></p>
+<p style="font-size: 13px; color: #666666;">Si vous avez des questions ou besoin d'aide, n'hésitez pas à nous contacter à <a href="mailto:support@ci-kiaba.com">support@ci-kiaba.com</a>.</p>
 {% endblock %}
 
