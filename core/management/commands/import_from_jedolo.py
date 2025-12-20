@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.db import transaction
 from ads.models import City, Ad, AdMedia
 from accounts.models import Profile
+from .jedolo_ads_data import JEDOLO_ADS, IVOIRIAN_PHONES
 import bleach
 
 try:
@@ -38,129 +39,8 @@ FIRST_NAMES = [
     "Amadou", "Bakary", "Ibrahima", "Mamadou", "Ousmane", "Sekou", "Tidiane",
 ]
 
-# Données d'annonces réalistes basées sur le style de ci.jedolo.com
-ANNOUNCE_DATA = [
-    {
-        "title": "Belle jeune femme disponible à Abidjan",
-        "description": "Jeune femme élégante et discrète, disponible pour vous accompagner dans vos moments de détente. Service de qualité avec professionnalisme.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Escort Girls"],
-    },
-    {
-        "title": "Massage relaxant et thérapeutique",
-        "description": "Massage professionnel pour vous détendre après une longue journée. Techniques variées selon vos besoins. Cadre agréable et discret.",
-        "category": Ad.Category.MASSAGES_SERVICES,
-        "subcategories": ["Massage Relaxant", "Massage sensuel ou érotique"],
-    },
-    {
-        "title": "Accompagnement élégant et discret",
-        "description": "Service d'accompagnement pour vos sorties et événements. Présence élégante et discrète garantie. Disponible selon vos besoins.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Escort Girls"],
-    },
-    {
-        "title": "Massage Ivoirien traditionnel",
-        "description": "Découvrez les bienfaits du massage traditionnel ivoirien. Techniques ancestrales pour votre bien-être. Expérience unique et authentique.",
-        "category": Ad.Category.MASSAGES_SERVICES,
-        "subcategories": ["Massage Ivoirien"],
-    },
-    {
-        "title": "Service premium et personnalisé",
-        "description": "Service haut de gamme adapté à vos préférences. Discrétion absolue et professionnalisme. Contactez-moi pour plus d'informations.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Escort Girls"],
-    },
-    {
-        "title": "Massage sportif et récupération",
-        "description": "Massage spécialisé pour sportifs. Aide à la récupération musculaire et à la détente. Techniques professionnelles appliquées.",
-        "category": Ad.Category.MASSAGES_SERVICES,
-        "subcategories": ["Massage sportif"],
-    },
-    {
-        "title": "Rencontre agréable et chaleureuse",
-        "description": "Recherche rencontre sincère et agréable. Échange convivial dans un cadre respectueux. Disponible pour discuter et partager.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Cherche Homme"],
-    },
-    {
-        "title": "Massage chinois traditionnel",
-        "description": "Massage chinois avec techniques ancestrales. Équilibre énergétique et bien-être garanti. Expérience relaxante et revitalisante.",
-        "category": Ad.Category.MASSAGES_SERVICES,
-        "subcategories": ["Massage chinois"],
-    },
-    {
-        "title": "Accueil chaleureux et professionnel",
-        "description": "Service de qualité avec un accueil personnalisé. Environnement confortable et discret. Disponible selon vos disponibilités.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Escort Girls"],
-    },
-    {
-        "title": "Massage intégral et complet",
-        "description": "Massage complet du corps pour une détente totale. Techniques variées pour votre bien-être. Moment de relaxation garanti.",
-        "category": Ad.Category.MASSAGES_SERVICES,
-        "subcategories": ["Massage Intégral"],
-    },
-    {
-        "title": "Gentleman attentionné et discret",
-        "description": "Accompagnement par un gentleman courtois et attentionné. Service personnalisé selon vos besoins. Discrétion assurée.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Escort Boys"],
-    },
-    {
-        "title": "Rencontre pour moments privilégiés",
-        "description": "Recherche compagnie agréable pour partager des moments privilégiés. Échange respectueux et convivial. Disponible sur rendez-vous.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Cherche Femme"],
-    },
-    {
-        "title": "Service de qualité exceptionnelle",
-        "description": "Service haut de gamme avec attention aux détails. Professionnalisme et discrétion garantis. Expérience mémorable assurée.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Escort Girls"],
-    },
-    {
-        "title": "Massage pour votre bien-être",
-        "description": "Prenez soin de vous avec un massage adapté à vos besoins. Techniques professionnelles dans un cadre apaisant. Réservation recommandée.",
-        "category": Ad.Category.MASSAGES_SERVICES,
-        "subcategories": ["Massage Relaxant"],
-    },
-    {
-        "title": "Accompagnement pour vos événements",
-        "description": "Service d'accompagnement pour vos soirées et événements. Présence élégante et adaptée à l'occasion. Contactez-moi pour discuter.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Escort Girls"],
-    },
-    {
-        "title": "Massage sensuel et relaxant",
-        "description": "Massage sensuel pour une détente complète. Techniques douces et apaisantes. Moment de bien-être personnalisé.",
-        "category": Ad.Category.MASSAGES_SERVICES,
-        "subcategories": ["Massage sensuel ou érotique"],
-    },
-    {
-        "title": "Service discret et professionnel",
-        "description": "Service professionnel avec discrétion absolue. Respect de vos préférences et besoins. Disponibilité flexible.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Escort Girls"],
-    },
-    {
-        "title": "Rencontre sincère et respectueuse",
-        "description": "Recherche rencontre basée sur le respect et la sincérité. Échange agréable et convivial. Disponible pour discuter.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Cherche Homme"],
-    },
-    {
-        "title": "Massage thérapeutique personnalisé",
-        "description": "Massage adapté à vos besoins spécifiques. Techniques thérapeutiques pour soulager tensions et stress. Consultation préalable.",
-        "category": Ad.Category.MASSAGES_SERVICES,
-        "subcategories": ["Massage Relaxant"],
-    },
-    {
-        "title": "Accompagnement élégant et raffiné",
-        "description": "Service d'accompagnement haut de gamme. Présence élégante pour vos occasions spéciales. Professionnalisme garanti.",
-        "category": Ad.Category.RENCONTRES_ESCORTES,
-        "subcategories": ["Escort Girls"],
-    },
-]
+# Utiliser les vraies annonces depuis jedolo_ads_data.py
+# Les annonces sont chargées dynamiquement
 
 
 class Command(BaseCommand):
@@ -289,10 +169,15 @@ class Command(BaseCommand):
             ads_per_user = total_ads // num_users
             extra_ads = total_ads % num_users
             
-            # Préparer le pool d'annonces
-            ad_pool = ANNOUNCE_DATA * ((total_ads // len(ANNOUNCE_DATA)) + 1)
+            # Préparer le pool d'annonces avec les vraies annonces de jedolo
+            ad_pool = JEDOLO_ADS * ((total_ads // len(JEDOLO_ADS)) + 1)
             random.shuffle(ad_pool)
             ad_index = 0
+            
+            # Pool de numéros de téléphone disponibles
+            phone_pool = IVOIRIAN_PHONES * ((num_users // len(IVOIRIAN_PHONES)) + 1)
+            random.shuffle(phone_pool)
+            phone_index = 0
             
             for i in range(num_users):
                 username = self.generate_username(i + 1)
@@ -312,11 +197,28 @@ class Command(BaseCommand):
                 user.set_password("password123")
                 user.save()
                 
-                # Créer le profil
+                # Créer le profil avec contacts complets
                 profile = Profile.objects.get(user=user)
                 profile.display_name = f"{random.choice(FIRST_NAMES)} {random.choice(IVOIRIAN_NAMES)}"
                 profile.city = random.choice(cities)
                 profile.country = "CI"
+                
+                # Assigner un numéro de téléphone unique
+                if phone_index >= len(phone_pool):
+                    phone_index = 0
+                    random.shuffle(phone_pool)
+                
+                phone = phone_pool[phone_index]
+                phone_index += 1
+                
+                # Ajouter le numéro au profil utilisateur
+                user.phone_e164 = phone
+                user.save()
+                
+                # Ajouter WhatsApp (même numéro ou différent)
+                profile.whatsapp_e164 = phone  # Utiliser le même numéro pour WhatsApp
+                
+                # Préférences de contact
                 profile.contact_prefs = random.sample(["sms", "whatsapp", "call"], random.randint(1, 3))
                 profile.bio_sanitized = "Profil créé automatiquement"
                 profile.save()
@@ -349,12 +251,23 @@ class Command(BaseCommand):
                         strip=True,
                     )
                     
-                    # Créer l'annonce
+                    # Convertir la catégorie string en valeur du modèle
+                    category_value = ad_data["category"]
+                    if category_value == "rencontres_escort":
+                        category_value = Ad.Category.RENCONTRES_ESCORTES
+                    elif category_value == "massages_services":
+                        category_value = Ad.Category.MASSAGES_SERVICES
+                    elif category_value == "produits_adultes":
+                        category_value = Ad.Category.PRODUITS_ADULTES
+                    else:
+                        category_value = Ad.Category.RENCONTRES_ESCORTES
+                    
+                    # Créer l'annonce avec les vraies données
                     ad = Ad.objects.create(
                         user=user,
                         title=title[:140],
                         description_sanitized=description[:2000],
-                        category=ad_data["category"],
+                        category=category_value,
                         subcategories=ad_data["subcategories"][:3],
                         city=random.choice(cities),
                         area=random.choice(["Cocody", "Yopougon", "Marcory", "Plateau", "Abobo", ""]),
