@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr" class="h-full">
   {% load static %}
-  {% load adsense_tags %}
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -104,20 +103,6 @@
     />
     {% endif %}
 
-    <!-- Google AdSense -->
-    {% if ADSENSE_ENABLED and ADSENSE_PUBLISHER_ID %}
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ ADSENSE_PUBLISHER_ID }}"
-      crossorigin="anonymous"
-    ></script>
-    <link
-      rel="preconnect"
-      href="https://pagead2.googlesyndication.com"
-      crossorigin
-    />
-    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
-    {% endif %}
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
     <link rel="dns-prefetch" href="https://unpkg.com" />
 
@@ -347,12 +332,7 @@
     </header>
     {% endblock %}
 
-    <!-- Petite annonce AdSense juste après le header (même dimension que le header) -->
-    {% if ADSENSE_ENABLED and ADSENSE_PUBLISHER_ID %}
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-center">
-      {% adsense_ad ad_format='horizontal' class_name='adsense-header' ad_style='display:block; text-align:center; min-height:56px; max-height:60px; max-width:100%;' %}
-    </div>
-    {% endif %} {% block cta_section %}
+    {% block cta_section %}
     <!-- CTA Publier après le header (uniforme sur toutes les pages) -->
     <section class="bg-gradient-to-br from-pink-500 to-red-500 text-white">
       <div class="max-w-7xl mx-auto p-3 md:p-4 text-center">
@@ -418,14 +398,6 @@
 
     <footer class="bg-gray-50 border-t border-gray-200 mt-8">
       <div class="max-w-7xl mx-auto p-6">
-        {% load adsense_tags %}
-        <!-- Publicité AdSense Footer (optionnel, peut être désactivé si trop intrusif) -->
-        {% comment %}
-        <div class="mb-6 text-center">
-          {% adsense_ad ad_format='horizontal' class_name='adsense-footer'
-          ad_style='display:block; text-align:center; min-height:90px;' %}
-        </div>
-        {% endcomment %}
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
           <!-- Navigation -->
