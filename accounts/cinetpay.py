@@ -1,49 +1,45 @@
 """
 Service d'intégration CinetPay pour les paiements
+Utilise le SDK officiel CinetPay
 """
-import hashlib
-import hmac
-import json
-import requests
 import logging
 from django.conf import settings
-from django.urls import reverse
 from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
+try:
+    from cinetpay_sdk.s_d_k import Cinetpay
+    CINETPAY_SDK_AVAILABLE = True
+except ImportError:
+    CINETPAY_SDK_AVAILABLE = False
+    logger.warning("CinetPay SDK non disponible. Installation: pip install -i https://test.pypi.org/simple/ cinetpay-sdk==0.1.1")
+
 
 class CinetPayService:
-    """Service pour gérer les paiements via CinetPay"""
+    """Service pour gérer les paiements via CinetPay en utilisant le SDK officiel"""
     
     @staticmethod
-    def get_config():
-        """Récupère la configuration CinetPay depuis les settings"""
-        site_id = getattr(settings, "CINETPAY_SITE_ID", "") or ""
+    def get_client():
+        """Crée et retourne un client CinetPay"""
+        if not CINETPAY_SDK_AVAILABLE:
+            raise ValueError("CinetPay SDK non installé. Exécutez: pip install -i https://test.pypi.org/simple/ cinetpay-sdk==0.1.1")
+        
         api_key = getattr(settings, "CINETPAY_API_KEY", "") or ""
-        site_key = getattr(settings, "CINETPAY_SITE_KEY", "") or ""
+        site_id = getattr(settings, "CINETPAY_SITE_ID", "") or ""
         
-        # Debug: logger les valeurs (sans exposer les clés complètes)
-        logger.debug(f"CinetPay config - SITE_ID: {site_id[:5]}... (len: {len(site_id)})")
-        logger.debug(f"CinetPay config - API_KEY: {api_key[:5]}... (len: {len(api_key)})")
-        logger.debug(f"CinetPay config - SITE_KEY: {site_key[:5]}... (len: {len(site_key)})")
+        if not api_key or not site_id:
+            missing = []
+            if not site_id:
+                missing.append("CINETPAY_SITE_ID")
+            if not api_key:
+                missing.append("CINETPAY_API_KEY")
+            raise ValueError(
+                f"Configuration CinetPay incomplète. Variables manquantes: {', '.join(missing)}"
+            )
         
-        return {
-            "site_id": site_id,
-            "api_key": api_key,
-            "site_key": site_key,
-            "notify_url": getattr(
-                settings,
-                "CINETPAY_NOTIFY_URL",
-                "https://ci-kiaba.com/accounts/payment/cinetpay/notify/"
-            ),
-            "return_url": getattr(
-                settings,
-                "CINETPAY_RETURN_URL",
-                "https://ci-kiaba.com/accounts/payment/cinetpay/return/"
-            ),
-        }
-
+        return Cinetpay(api_key, site_id)
+    
     @staticmethod
     def generate_transaction_id(user_id, transaction_id):
         """Génère un ID de transaction unique pour CinetPay"""
@@ -52,131 +48,128 @@ class CinetPayService:
     @staticmethod
     def create_payment_link(transaction, amount, description):
         """Crée un lien de paiement CinetPay"""
-        config = CinetPayService.get_config()
+        try:
+            client = CinetPayService.get_client()
+        except ValueError as e:
+            raise ValueError(str(e))
         
-        # Vérifier que toutes les clés nécessaires sont présentes
-        missing = []
-        if not config["site_id"]:
-            missing.append("CINETPAY_SITE_ID")
-        if not config["api_key"]:
-            missing.append("CINETPAY_API_KEY")
-        
-        if missing:
-            raise ValueError(
-                f"Configuration CinetPay incomplète. Variables manquantes: {', '.join(missing)}"
-            )
-        
+        # Générer l'ID de transaction
         transaction_id = CinetPayService.generate_transaction_id(
             transaction.user_id,
             transaction.id
         )
         
-        # Paramètres pour CinetPay
-        params = {
-            "apikey": config["api_key"],
-            "site_id": config["site_id"],
-            "transaction_id": transaction_id,
-            "amount": str(int(float(amount))),
-            "currency": "XOF",  # FCFA
-            "description": description[:255],
-            "notify_url": config["notify_url"],
-            "return_url": config["return_url"],
-            "channels": "ALL",  # Tous les canaux de paiement
+        # Récupérer les URLs depuis les settings
+        notify_url = getattr(
+            settings,
+            "CINETPAY_NOTIFY_URL",
+            "https://ci-kiaba.com/accounts/payment/cinetpay/notify/"
+        )
+        return_url = getattr(
+            settings,
+            "CINETPAY_RETURN_URL",
+            "https://ci-kiaba.com/accounts/payment/cinetpay/return/"
+        )
+        
+        # Récupérer les informations utilisateur
+        user = transaction.user
+        customer_name = user.first_name or user.username
+        customer_surname = user.last_name or ""
+        
+        # Préparer les données pour l'initialisation du paiement
+        data = {
+            'amount': int(float(amount)),  # Montant en entier
+            'currency': "XOF",  # FCFA
+            'transaction_id': transaction_id,
+            'description': description[:255],
+            'return_url': return_url,
+            'notify_url': notify_url,
+            'customer_name': customer_name[:50] if customer_name else "Client",
+            'customer_surname': customer_surname[:50] if customer_surname else "",
         }
         
-        # Générer la signature
-        signature_data = (
-            f"{params['amount']}{params['apikey']}{params['site_id']}"
-            f"{params['transaction_id']}{params['currency']}"
-        )
-        signature = hashlib.sha256(signature_data.encode()).hexdigest()
-        params["signature"] = signature
-        
-        # URL de l'API CinetPay
-        api_url = "https://api.cinetpay.com/v1/payment"
-        
         try:
-            response = requests.post(api_url, json=params, timeout=30)
-            response.raise_for_status()
-            data = response.json()
+            # Initialiser le paiement via le SDK
+            response = client.PaymentInitialization(data)
             
-            if data.get("code") == "201":
-                # Sauvegarder l'ID de transaction CinetPay
-                transaction.cinetpay_transaction_id = transaction_id
-                transaction.save()
-                
-                return data.get("data", {}).get("payment_url")
+            # Le SDK retourne généralement un dictionnaire avec 'code' et 'data'
+            if isinstance(response, dict):
+                if response.get('code') == '201' or response.get('code') == 201:
+                    # Sauvegarder l'ID de transaction CinetPay
+                    transaction.cinetpay_transaction_id = transaction_id
+                    transaction.save()
+                    
+                    # Retourner l'URL de paiement
+                    payment_url = response.get('data', {}).get('payment_url') or response.get('payment_url')
+                    if payment_url:
+                        return payment_url
+                    else:
+                        raise ValueError("URL de paiement non trouvée dans la réponse CinetPay")
+                else:
+                    error_msg = response.get('message', response.get('description', 'Erreur inconnue'))
+                    raise ValueError(f"Erreur CinetPay: {error_msg}")
             else:
-                raise ValueError(f"Erreur CinetPay: {data.get('message', 'Erreur inconnue')}")
-        except requests.RequestException as e:
+                # Si la réponse est directement l'URL
+                if isinstance(response, str) and response.startswith('http'):
+                    transaction.cinetpay_transaction_id = transaction_id
+                    transaction.save()
+                    return response
+                else:
+                    raise ValueError(f"Réponse CinetPay inattendue: {response}")
+                    
+        except Exception as e:
+            logger.error(f"Erreur lors de l'initialisation du paiement CinetPay: {str(e)}")
             raise ValueError(f"Erreur de connexion à CinetPay: {str(e)}")
 
     @staticmethod
     def verify_payment(cinetpay_transaction_id):
         """Vérifie le statut d'un paiement CinetPay"""
-        config = CinetPayService.get_config()
-        
-        # Vérifier que toutes les clés nécessaires sont présentes
-        missing = []
-        if not config["site_id"]:
-            missing.append("CINETPAY_SITE_ID")
-        if not config["api_key"]:
-            missing.append("CINETPAY_API_KEY")
-        
-        if missing:
-            raise ValueError(
-                f"Configuration CinetPay incomplète. Variables manquantes: {', '.join(missing)}"
-            )
-        
-        params = {
-            "apikey": config["api_key"],
-            "site_id": config["site_id"],
-            "transaction_id": cinetpay_transaction_id,
-        }
-        
-        # Générer la signature
-        signature_data = (
-            f"{params['apikey']}{params['site_id']}{params['transaction_id']}"
-        )
-        signature = hashlib.sha256(signature_data.encode()).hexdigest()
-        params["signature"] = signature
-        
-        api_url = "https://api.cinetpay.com/v1/payment/check"
+        try:
+            client = CinetPayService.get_client()
+        except ValueError as e:
+            logger.error(f"Erreur de configuration CinetPay: {str(e)}")
+            return None
         
         try:
-            response = requests.post(api_url, json=params, timeout=30)
-            response.raise_for_status()
-            data = response.json()
+            # Vérifier avec l'ID de transaction
+            response = client.TransactionVerfication_trx(cinetpay_transaction_id)
             
-            if data.get("code") == "00":
-                payment_data = data.get("data", {})
-                return {
-                    "status": payment_data.get("status"),
-                    "amount": payment_data.get("amount"),
-                    "currency": payment_data.get("currency"),
-                    "payment_method": payment_data.get("payment_method"),
-                }
-            else:
-                return None
-        except requests.RequestException:
+            if isinstance(response, dict):
+                if response.get('code') == '00' or response.get('code') == 0:
+                    payment_data = response.get('data', {})
+                    return {
+                        "status": payment_data.get("status"),
+                        "amount": payment_data.get("amount"),
+                        "currency": payment_data.get("currency"),
+                        "payment_method": payment_data.get("payment_method"),
+                    }
+            return None
+        except Exception as e:
+            logger.error(f"Erreur lors de la vérification du paiement CinetPay: {str(e)}")
             return None
 
     @staticmethod
     def verify_webhook_signature(data, signature):
         """Vérifie la signature d'un webhook CinetPay"""
-        config = CinetPayService.get_config()
+        site_key = getattr(settings, "CINETPAY_SITE_KEY", "") or ""
         
-        # Construire la chaîne à signer
+        if not site_key:
+            logger.warning("CINETPAY_SITE_KEY non configuré, impossible de vérifier la signature")
+            return False
+        
+        # Construire la chaîne à signer selon la documentation CinetPay
+        import hmac
+        import hashlib
+        
         signature_data = (
-            f"{data.get('cpm_trans_id')}{config['site_key']}"
-            f"{data.get('cpm_amount')}{data.get('cpm_currency')}"
+            f"{data.get('cpm_trans_id', '')}{site_key}"
+            f"{data.get('cpm_amount', '')}{data.get('cpm_currency', 'XOF')}"
         )
         
         expected_signature = hmac.new(
-            config["site_key"].encode(),
+            site_key.encode(),
             signature_data.encode(),
             hashlib.sha256
         ).hexdigest()
         
         return hmac.compare_digest(signature, expected_signature)
-

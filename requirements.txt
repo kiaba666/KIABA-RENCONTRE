@@ -64,3 +64,5 @@ whitenoise==6.7.0
 gunicorn==23.0.0
 beautifulsoup4==4.12.3
 requests==2.31.0
+# Note: CinetPay SDK est installé dans le Dockerfile depuis test PyPI
+# car il n'est pas disponible sur PyPI principal
