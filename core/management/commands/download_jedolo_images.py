@@ -15,7 +15,7 @@ except ImportError:
 
 
 class Command(BaseCommand):
-    help = "Télécharge les images depuis ci.jedolo.com et les stocke dans media/jedolo_images/"
+    help = "Télécharge les images depuis ci.jedolo.com et les stocke dans static/jedolo_images/"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -36,7 +36,8 @@ class Command(BaseCommand):
         
         # Créer le dossier pour stocker les images
         base_dir = Path(__file__).resolve().parent.parent.parent.parent
-        images_dir = base_dir / "media" / "jedolo_images"
+        # Sauvegarder dans static/ pour que les images soient dans le repo
+        images_dir = base_dir / "static" / "jedolo_images"
         images_dir.mkdir(parents=True, exist_ok=True)
         
         self.stdout.write(f"Téléchargement des images dans: {images_dir}")
@@ -72,12 +73,28 @@ class Command(BaseCommand):
                 img_tags = soup.find_all("img")
                 
                 for img in img_tags:
-                    img_url = img.get("src") or img.get("data-src") or img.get("data-lazy-src")
+                    # Essayer plusieurs attributs pour trouver l'URL de l'image
+                    img_url = (
+                        img.get("src") or 
+                        img.get("data-src") or 
+                        img.get("data-lazy-src") or
+                        img.get("data-original") or
+                        img.get("data-url")
+                    )
                     if img_url:
                         # Convertir en URL absolue
                         img_url = urljoin(url, img_url)
                         
                         # Filtrer les images pertinentes
+                        if self.is_valid_image_url(img_url):
+                            image_urls.add(img_url)
+                
+                # Chercher aussi dans les balises <a> avec des liens vers des images
+                link_tags = soup.find_all("a", href=re.compile(r"\.(jpg|jpeg|png|webp|gif)", re.I))
+                for link in link_tags:
+                    href = link.get("href")
+                    if href:
+                        img_url = urljoin(url, href)
                         if self.is_valid_image_url(img_url):
                             image_urls.add(img_url)
                             
