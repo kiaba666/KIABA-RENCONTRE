@@ -56,6 +56,14 @@ class ProfileEditForm(forms.ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Pré-remplir whatsapp_e164 depuis le profil
+        if self.instance and self.instance.pk:
+            self.fields["whatsapp_e164"].initial = self.instance.whatsapp_e164
+            if self.instance.contact_prefs:
+                self.fields["contact_prefs"].initial = self.instance.contact_prefs
+
 
 class CustomPasswordChangeForm(PasswordChangeForm):
     """Formulaire personnalisé pour changer le mot de passe"""
