@@ -77,48 +77,90 @@ class CinetPayService:
         customer_surname = user.last_name or ""
         
         # Préparer les données pour l'initialisation du paiement
+        # Convertir le montant en entier (CinetPay attend un entier)
+        amount_int = int(float(amount))
+        
+        # Vérifier que le montant est valide
+        if amount_int <= 0:
+            raise ValueError("Le montant doit être supérieur à 0")
+        
         data = {
-            'amount': int(float(amount)),  # Montant en entier
+            'amount': amount_int,
             'currency': "XOF",  # FCFA
             'transaction_id': transaction_id,
-            'description': description[:255],
+            'description': description[:255] if description else "Paiement KIABA",
             'return_url': return_url,
             'notify_url': notify_url,
             'customer_name': customer_name[:50] if customer_name else "Client",
             'customer_surname': customer_surname[:50] if customer_surname else "",
         }
         
+        # Logger les données (sans les URLs complètes pour la sécurité)
+        logger.debug(f"Données paiement: amount={data['amount']}, currency={data['currency']}, transaction_id={data['transaction_id']}")
+        
         try:
+            # Logger les données envoyées (sans les clés sensibles)
+            logger.info(f"Initialisation paiement CinetPay - Transaction ID: {transaction_id}, Montant: {data['amount']} XOF")
+            
             # Initialiser le paiement via le SDK
             response = client.PaymentInitialization(data)
             
+            # Logger la réponse complète pour déboguer
+            logger.info(f"Réponse CinetPay: {response}")
+            
             # Le SDK retourne généralement un dictionnaire avec 'code' et 'data'
             if isinstance(response, dict):
-                if response.get('code') == '201' or response.get('code') == 201:
+                code = response.get('code')
+                # Vérifier différents codes de succès possibles
+                if code in ['201', 201, '00', 0, '200', 200]:
                     # Sauvegarder l'ID de transaction CinetPay
                     transaction.cinetpay_transaction_id = transaction_id
                     transaction.save()
                     
-                    # Retourner l'URL de paiement
-                    payment_url = response.get('data', {}).get('payment_url') or response.get('payment_url')
-                    if payment_url:
+                    # Retourner l'URL de paiement (plusieurs formats possibles)
+                    payment_url = (
+                        response.get('data', {}).get('payment_url') or
+                        response.get('data', {}).get('url') or
+                        response.get('payment_url') or
+                        response.get('url') or
+                        response.get('data')
+                    )
+                    
+                    if payment_url and isinstance(payment_url, str) and payment_url.startswith('http'):
+                        logger.info(f"URL de paiement générée: {payment_url[:50]}...")
                         return payment_url
                     else:
+                        logger.error(f"URL de paiement non trouvée dans la réponse. Réponse complète: {response}")
                         raise ValueError("URL de paiement non trouvée dans la réponse CinetPay")
                 else:
-                    error_msg = response.get('message', response.get('description', 'Erreur inconnue'))
+                    # Erreur retournée par CinetPay
+                    error_msg = (
+                        response.get('message') or
+                        response.get('description') or
+                        response.get('error') or
+                        f"Code d'erreur: {code}"
+                    )
+                    logger.error(f"Erreur CinetPay - Code: {code}, Message: {error_msg}, Réponse complète: {response}")
                     raise ValueError(f"Erreur CinetPay: {error_msg}")
-            else:
+            elif isinstance(response, str):
                 # Si la réponse est directement l'URL
-                if isinstance(response, str) and response.startswith('http'):
+                if response.startswith('http'):
                     transaction.cinetpay_transaction_id = transaction_id
                     transaction.save()
+                    logger.info(f"URL de paiement reçue directement: {response[:50]}...")
                     return response
                 else:
+                    logger.error(f"Réponse CinetPay inattendue (string): {response}")
                     raise ValueError(f"Réponse CinetPay inattendue: {response}")
+            else:
+                logger.error(f"Type de réponse CinetPay inattendu: {type(response)}, Valeur: {response}")
+                raise ValueError(f"Réponse CinetPay inattendue: {response}")
                     
+        except ValueError as e:
+            # Re-raise les ValueError (erreurs métier)
+            raise
         except Exception as e:
-            logger.error(f"Erreur lors de l'initialisation du paiement CinetPay: {str(e)}")
+            logger.error(f"Exception lors de l'initialisation du paiement CinetPay: {type(e).__name__}: {str(e)}", exc_info=True)
             raise ValueError(f"Erreur de connexion à CinetPay: {str(e)}")
 
     @staticmethod
