@@ -23,13 +23,13 @@ services:
       - key: DB_ENGINE
         value: "postgres"
       - key: POSTGRES_DB
-        value: "kiaba_db_wzbz"
+        value: "kiaba_db_wzbz_8ruc"
       - key: POSTGRES_USER
         value: "kiaba_db_wzbz_user"
       - key: POSTGRES_PASSWORD
-        value: "zQ7fPBQvrEER5NDQVAqjCWHBbfFQCuIx"
+        value: "GIC0OwgP0ACv90JSg1EH19Hre1Ndg1ir"
       - key: POSTGRES_HOST
-        value: "dpg-d40ucg49c44c73cdi0qg.oregon-postgres.render.com"
+        value: "dpg-d53940khg0os738mrqq0-a.oregon-postgres.render.com"
       - key: POSTGRES_PORT
         value: "5432"
       # Email configuration (remove EMAIL_BACKEND - handled by settings.py)
