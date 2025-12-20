@@ -218,43 +218,57 @@ if "test" in sys.argv or env("DB_ENGINE") == "sqlite":
     }
 else:
     # Configuration PostgreSQL avec SSL pour Render
-    postgres_host = env("POSTGRES_HOST", default="")
-    is_render_db = "render.com" in postgres_host.lower() or os.environ.get("RENDER_EXTERNAL_URL")
-
-    # Options de connexion de base
-    db_options = {
-        "connect_timeout": 10,
-    }
-
-    if is_render_db:
-        # Sur Render, PostgreSQL exige TOUJOURS SSL/TLS pour toutes les connexions
-        # Utiliser le host fourni tel quel (Render peut fournir un host avec -a dans le nom)
-        # Ne pas modifier le host, utiliser celui fourni par Render
-        
-        # Render PostgreSQL exige SSL pour toutes les connexions
-        # IMPORTANT: Pour psycopg2, sslmode doit être dans OPTIONS
-        # Utiliser 'require' qui force SSL
-        db_options["sslmode"] = "require"
-        # Définir aussi les variables d'environnement pour psycopg2
-        os.environ["PGSSLMODE"] = "require"
-        # Ajouter connect_timeout pour éviter les timeouts
-        db_options["connect_timeout"] = 10
-        # Ne pas définir de certificats SSL (utiliser les certificats système par défaut)
-        # Cela permet à psycopg2 d'utiliser les certificats système
-
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": env("POSTGRES_DB"),
-            "USER": env("POSTGRES_USER"),
-            "PASSWORD": env("POSTGRES_PASSWORD"),
-            "HOST": postgres_host,
-            "PORT": env("POSTGRES_PORT"),
-            "OPTIONS": db_options,
-            "CONN_MAX_AGE": 0,  # Désactiver le pooling pour éviter les problèmes de connexion
-            "ATOMIC_REQUESTS": True,
+    # Vérifier d'abord si DATABASE_URL est fourni par Render (méthode recommandée)
+    database_url = os.environ.get("DATABASE_URL")
+    
+    if database_url:
+        # Render fournit DATABASE_URL automatiquement quand on lie une base de données
+        # Utiliser django-environ pour parser DATABASE_URL
+        DATABASES = {
+            "default": env.db("DATABASE_URL")
         }
-    }
+        
+        # S'assurer que sslmode=prefer est dans OPTIONS pour Render
+        if "OPTIONS" not in DATABASES["default"]:
+            DATABASES["default"]["OPTIONS"] = {}
+        # Utiliser 'prefer' qui essaie SSL mais ne l'exige pas strictement
+        # Cela évite les problèmes de validation de certificat
+        DATABASES["default"]["OPTIONS"]["sslmode"] = "prefer"
+        DATABASES["default"]["CONN_MAX_AGE"] = 0
+        DATABASES["default"]["ATOMIC_REQUESTS"] = True
+    else:
+        # Fallback : utiliser les variables individuelles
+        postgres_host = env("POSTGRES_HOST", default="")
+        is_render_db = "render.com" in postgres_host.lower() or os.environ.get("RENDER_EXTERNAL_URL")
+
+        # Options de connexion de base
+        db_options = {
+            "connect_timeout": 10,
+        }
+
+        if is_render_db:
+            # Sur Render, PostgreSQL exige SSL/TLS pour toutes les connexions
+            # Utiliser 'prefer' qui essaie SSL mais ne l'exige pas strictement
+            # Cela évite les problèmes de validation de certificat
+            db_options["sslmode"] = "prefer"
+            # Définir aussi les variables d'environnement pour psycopg2
+            os.environ["PGSSLMODE"] = "prefer"
+            # Ajouter connect_timeout pour éviter les timeouts
+            db_options["connect_timeout"] = 10
+
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": env("POSTGRES_DB"),
+                "USER": env("POSTGRES_USER"),
+                "PASSWORD": env("POSTGRES_PASSWORD"),
+                "HOST": postgres_host,
+                "PORT": env("POSTGRES_PORT"),
+                "OPTIONS": db_options,
+                "CONN_MAX_AGE": 0,  # Désactiver le pooling pour éviter les problèmes de connexion
+                "ATOMIC_REQUESTS": True,
+            }
+        }
 
 
 # Password validation
