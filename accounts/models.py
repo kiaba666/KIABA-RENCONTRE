@@ -64,8 +64,7 @@ class Profile(models.Model):
 def create_profile(sender, instance, created, **kwargs):  # pragma: no cover
     if created:
         Profile.objects.create(user=instance, display_name=instance.username)
-        # Créer aussi un compte avec 2 annonces gratuites pour les nouveaux utilisateurs
-        Account.objects.create(user=instance, free_ads_remaining=2)
+        # Note: Account n'est plus créé automatiquement car le système de paiement est désactivé
 
 
 models.signals.post_save.connect(create_profile, sender=CustomUser)
