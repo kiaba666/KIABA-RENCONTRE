@@ -132,7 +132,12 @@ class Command(BaseCommand):
         base_url = "https://ci.jedolo.com"
         
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Connection": "keep-alive",
+            "Upgrade-Insecure-Requests": "1",
         }
 
         try:
@@ -350,6 +355,9 @@ class Command(BaseCommand):
     @transaction.atomic
     def create_users_and_ads(self, num_users, min_ads, max_ads, scraped_ads, cities):
         """Crée les utilisateurs et leurs annonces"""
+        from django.db.models.signals import post_save
+        from accounts.signals import on_user_saved
+        
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         }
@@ -357,28 +365,35 @@ class Command(BaseCommand):
         created_users = 0
         created_ads = 0
         
-        # Réutiliser les annonces scrapées
-        ad_pool = scraped_ads * ((num_users * max_ads) // len(scraped_ads) + 1)
-        random.shuffle(ad_pool)
-        ad_index = 0
+        # Désactiver temporairement le signal d'envoi d'email
+        post_save.disconnect(on_user_saved, sender=User)
         
-        for i in range(num_users):
-            username = self.generate_username(i + 1)
+        try:
+            # Réutiliser les annonces scrapées
+            if scraped_ads:
+                ad_pool = scraped_ads * ((num_users * max_ads) // len(scraped_ads) + 1)
+                random.shuffle(ad_pool)
+            else:
+                ad_pool = []
+            ad_index = 0
             
-            # Vérifier si l'utilisateur existe déjà
-            if User.objects.filter(username=username).exists():
-                username = f"{username}_{i+1}_{random.randint(1000, 9999)}"
-            
-            # Créer l'utilisateur
-            user = User.objects.create(
-                username=username,
-                email=f"{username}@example.com",
-                role=User.Role.PROVIDER,
-                is_active=True,
-                is_verified=random.choice([True, False]),
-            )
-            user.set_password("password123")
-            user.save()
+            for i in range(num_users):
+                username = self.generate_username(i + 1)
+                
+                # Vérifier si l'utilisateur existe déjà
+                if User.objects.filter(username=username).exists():
+                    username = f"{username}_{i+1}_{random.randint(1000, 9999)}"
+                
+                # Créer l'utilisateur sans déclencher le signal d'email
+                user = User.objects.create(
+                    username=username,
+                    email=f"{username}@example.com",
+                    role=User.Role.PROVIDER,
+                    is_active=True,
+                    is_verified=random.choice([True, False]),
+                )
+                user.set_password("password123")
+                user.save()
             
             # Créer le profil
             profile = Profile.objects.get(user=user)
@@ -482,6 +497,10 @@ class Command(BaseCommand):
             
             if created_users % 50 == 0:
                 self.stdout.write(f"  → {created_users} utilisateurs créés...")
+        
+        finally:
+            # Réactiver le signal d'envoi d'email
+            post_save.connect(on_user_saved, sender=User)
         
         self.stdout.write(
             self.style.SUCCESS(
