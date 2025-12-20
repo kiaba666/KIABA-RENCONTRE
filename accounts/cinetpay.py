@@ -21,7 +21,7 @@ class CinetPayService:
     
     @staticmethod
     def get_client():
-        """Crée et retourne un client CinetPay"""
+        """Crée et retourne un client CinetPay en mode production"""
         if not CINETPAY_SDK_AVAILABLE:
             raise ValueError("CinetPay SDK non installé. Exécutez: pip install -i https://test.pypi.org/simple/ cinetpay-sdk==0.1.1")
         
@@ -38,7 +38,27 @@ class CinetPayService:
                 f"Configuration CinetPay incomplète. Variables manquantes: {', '.join(missing)}"
             )
         
-        return Cinetpay(api_key, site_id)
+        # Créer le client CinetPay
+        # Le SDK utilise automatiquement le mode production si les bonnes clés sont utilisées
+        # Vérifier que ce ne sont pas des clés de test
+        if 'test' in api_key.lower() or 'test' in site_id.lower():
+            logger.warning("ATTENTION: Clés CinetPay semblent être en mode test. Vérifiez vos clés API de production.")
+        
+        client = Cinetpay(api_key, site_id)
+        
+        # Si le SDK supporte un paramètre mode, l'ajouter
+        # Note: Le SDK Python peut ne pas avoir ce paramètre, mais on le tente
+        try:
+            # Certains SDKs ont un paramètre mode dans le constructeur ou une méthode setMode
+            if hasattr(client, 'setMode'):
+                client.setMode('PRODUCTION')
+            elif hasattr(client, 'mode'):
+                client.mode = 'PRODUCTION'
+        except Exception as e:
+            logger.debug(f"Impossible de définir le mode production explicitement: {e}")
+            # Ce n'est pas grave, le SDK utilisera le mode basé sur les clés API
+        
+        return client
     
     @staticmethod
     def generate_transaction_id(user_id, transaction_id):

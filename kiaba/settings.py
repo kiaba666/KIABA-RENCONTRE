@@ -602,6 +602,7 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 CINETPAY_SITE_ID = env("CINETPAY_SITE_ID", default="")
 CINETPAY_API_KEY = env("CINETPAY_API_KEY", default="")
 CINETPAY_SITE_KEY = env("CINETPAY_SITE_KEY", default="")
+CINETPAY_MODE = env("CINETPAY_MODE", default="PRODUCTION")  # PRODUCTION ou TEST
 CINETPAY_NOTIFY_URL = env(
     "CINETPAY_NOTIFY_URL",
     default="https://ci-kiaba.com/accounts/payment/cinetpay/notify/"
