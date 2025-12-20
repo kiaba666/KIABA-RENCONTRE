@@ -218,8 +218,36 @@ class Command(BaseCommand):
             cities.append(city)
         return cities
 
+    def get_jedolo_images(self):
+        """Récupère la liste des images téléchargées depuis jedolo"""
+        from pathlib import Path
+        from django.conf import settings
+        
+        base_dir = Path(__file__).resolve().parent.parent.parent.parent
+        
+        # Chercher d'abord dans static/jedolo_images (images dans le repo)
+        static_images_dir = base_dir / "static" / "jedolo_images"
+        # Puis dans media/jedolo_images (images téléchargées)
+        media_images_dir = base_dir / "media" / "jedolo_images"
+        
+        image_files = []
+        
+        # Chercher dans static/
+        if static_images_dir.exists():
+            for ext in ["*.jpg", "*.jpeg", "*.png", "*.webp", "*.gif"]:
+                image_files.extend(static_images_dir.glob(ext))
+                image_files.extend(static_images_dir.glob(ext.upper()))
+        
+        # Chercher dans media/ si static/ est vide
+        if not image_files and media_images_dir.exists():
+            for ext in ["*.jpg", "*.jpeg", "*.png", "*.webp", "*.gif"]:
+                image_files.extend(media_images_dir.glob(ext))
+                image_files.extend(media_images_dir.glob(ext.upper()))
+        
+        return sorted(image_files)
+    
     def create_fake_image(self):
-        """Crée une image fictive"""
+        """Crée une image fictive si aucune image jedolo n'est disponible"""
         if Image is None:
             return None
         
@@ -335,17 +363,54 @@ class Command(BaseCommand):
                         expires_at=timezone.now() + timezone.timedelta(days=random.randint(14, 30)),
                     )
                     
-                    # Ajouter une image fictive
-                    img_content = self.create_fake_image()
-                    if img_content:
-                        try:
-                            AdMedia.objects.create(
-                                ad=ad,
-                                image=ContentFile(img_content, name=f"ad_{ad.id}_1.jpg"),
-                                is_primary=True,
-                            )
-                        except Exception:
-                            pass
+                    # Ajouter des images depuis le dossier jedolo_images
+                    jedolo_images = self.get_jedolo_images()
+                    images_added = 0
+                    max_images_per_ad = min(5, len(jedolo_images) if jedolo_images else 1)
+                    
+                    if jedolo_images:
+                        # Utiliser des images aléatoires du dossier
+                        selected_images = random.sample(jedolo_images, min(max_images_per_ad, len(jedolo_images)))
+                        
+                        for img_idx, img_path in enumerate(selected_images):
+                            try:
+                                with open(img_path, "rb") as f:
+                                    img_content = f.read()
+                                
+                                # Vérifier la taille (max 5MB)
+                                if len(img_content) > 5 * 1024 * 1024:
+                                    continue
+                                
+                                ext = img_path.suffix or ".jpg"
+                                filename = f"ad_{ad.id}_{images_added+1}{ext}"
+                                
+                                AdMedia.objects.create(
+                                    ad=ad,
+                                    image=ContentFile(img_content, name=filename),
+                                    is_primary=(images_added == 0),
+                                )
+                                images_added += 1
+                                
+                                if images_added >= 5:  # Maximum 5 images par annonce
+                                    break
+                                    
+                            except Exception as e:
+                                self.stdout.write(
+                                    self.style.WARNING(f"Erreur lors de l'ajout de l'image {img_path}: {str(e)}")
+                                )
+                    
+                    # Si aucune image jedolo n'a été ajoutée, créer une image fictive
+                    if images_added == 0:
+                        img_content = self.create_fake_image()
+                        if img_content:
+                            try:
+                                AdMedia.objects.create(
+                                    ad=ad,
+                                    image=ContentFile(img_content, name=f"ad_{ad.id}_1.jpg"),
+                                    is_primary=True,
+                                )
+                            except Exception:
+                                pass
                     
                     created_ads += 1
                     
