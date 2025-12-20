@@ -51,7 +51,7 @@ services:
       - key: CINETPAY_SITE_ID
         value: "105907241"
       - key: CINETPAY_API_KEY
-        value: "9694017766946fdd7c66b09.59234458"
+        value: "1317052651681a6fdef33a80.27918103"
       - key: CINETPAY_SITE_KEY
         value: "9694017766946fdd7c66b09.59234458"
       - key: CINETPAY_NOTIFY_URL
