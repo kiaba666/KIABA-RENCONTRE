@@ -4,9 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Q
+from django.core.exceptions import ValidationError
 from ads.models import Ad, AdMedia
 from ads.forms import AdForm
 from accounts.models import Profile
+from accounts.services import AccountService
 from accounts.tasks import send_ad_published_email
 
 
@@ -48,6 +50,22 @@ def post(request: HttpRequest) -> HttpResponse:
             # Mettre à jour le numéro de téléphone dans l'utilisateur
             request.user.phone_e164 = form.cleaned_data["phone1"]
             request.user.save()
+
+            # Vérifier si l'utilisateur peut poster une annonce
+            if not AccountService.can_post_ad(request.user):
+                messages.error(
+                    request,
+                    "Vous n'avez plus de crédits d'annonces disponibles. "
+                    "Veuillez recharger votre compte pour continuer."
+                )
+                return render(request, "core/post.html", {"form": form})
+
+            # Utiliser un crédit d'annonce
+            try:
+                AccountService.use_ad_credit(request.user)
+            except ValidationError as e:
+                messages.error(request, str(e))
+                return render(request, "core/post.html", {"form": form})
 
             # Déterminer le statut selon si le profil est validé
             is_verified = profile.is_verified

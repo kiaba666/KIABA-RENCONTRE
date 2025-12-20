@@ -9,7 +9,7 @@ def ad_list(request: HttpRequest) -> HttpResponse:
     qs = (
         Ad.objects.filter(status=Ad.Status.APPROVED)
         .select_related("city", "user")
-        .order_by("-created_at")
+        .order_by("-is_premium", "-is_urgent", "-created_at")
     )
     city = request.GET.get("city")
     category = request.GET.get("category")

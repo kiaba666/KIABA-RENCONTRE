@@ -88,10 +88,35 @@ class Ad(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Champs pour les boosts
+    is_premium = models.BooleanField(
+        default=False,
+        help_text=_("Annonce premium (en tête de liste)")
+    )
+    premium_until = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_("Date jusqu'à laquelle l'annonce est premium")
+    )
+    is_urgent = models.BooleanField(
+        default=False,
+        help_text=_("Annonce urgente (logo urgent)")
+    )
+    urgent_until = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_("Date jusqu'à laquelle l'annonce est urgente")
+    )
+    extended_until = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=_("Date de prolongation de l'annonce")
+    )
+
     features = models.ManyToManyField(Feature, through="AdFeature", blank=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["-is_premium", "-is_urgent", "-created_at"]
 
     def clean(self):
         invalid = [s for s in self.subcategories if s not in self.SUBCATEGORY_CHOICES]
