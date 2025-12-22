@@ -362,6 +362,26 @@
         font-size: 0.875rem;
         margin: 0;
       }
+
+      /* Chapeau de Noël sur le logo */
+      .logo-container {
+        position: relative;
+        display: inline-block;
+      }
+      .christmas-hat {
+        position: absolute;
+        top: -12px;
+        left: -8px;
+        width: 32px;
+        height: auto;
+        z-index: 10;
+        animation: hatWiggle 2s ease-in-out infinite;
+        transform-origin: bottom center;
+      }
+      @keyframes hatWiggle {
+        0%, 100% { transform: rotate(-5deg); }
+        50% { transform: rotate(5deg); }
+      }
     </style>
 
     <!-- Script pour afficher le body une fois la page chargée -->
@@ -390,14 +410,22 @@
         class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between"
       >
         <a href="/" class="text-2xl font-semibold tracking-tight text-gray-900">
-          <img
-            src="{% static 'img/logo.png' %}"
-            alt="KIABA - Site de rencontres et petites annonces adultes en Côte d'Ivoire"
-            class="h-8 w-auto"
-            loading="eager"
-            width="264"
-            height="112"
-          />
+          <div class="logo-container">
+            <img
+              src="{% static 'img/christmas_hat.png' %}"
+              alt="Chapeau de Noël"
+              class="christmas-hat"
+              loading="eager"
+            />
+            <img
+              src="{% static 'img/logo.png' %}"
+              alt="KIABA - Site de rencontres et petites annonces adultes en Côte d'Ivoire"
+              class="h-8 w-auto"
+              loading="eager"
+              width="264"
+              height="112"
+            />
+          </div>
         </a>
         <nav class="hidden md:flex items-center gap-3">
           <a href="/ads" class="text-gray-700 hover:text-gray-900">Annonces</a>
