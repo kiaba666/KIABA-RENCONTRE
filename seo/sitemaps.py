@@ -4,20 +4,28 @@ from ads.models import Ad, City
 
 
 class StaticSitemap(Sitemap):
-    changefreq = "weekly"
-    priority = 0.8
+    changefreq = "daily"
+    priority = 1.0  # Page d'accueil = priorité maximale
 
     def items(self):
         return [
-            "landing",  # core.urls name="landing"
-            "post",  # core.urls name="post"
-            "ad_list",  # ads.urls name="ad_list"
-            "account_login",  # allauth
-            "account_signup",  # allauth
+            "landing",  # core.urls name="landing" - Page d'accueil
+            "ad_list",  # ads.urls name="ad_list" - Liste des annonces
+            "post",  # core.urls name="post" - Publier une annonce
+            "legal_tos",  # core.urls - CGU
+            "legal_privacy",  # core.urls - Confidentialité
+            "legal_content_policy",  # core.urls - Politique de contenu
         ]
 
     def location(self, item):
+        if item == "landing":
+            return "/"  # Page d'accueil
         return reverse(item)
+    
+    def lastmod(self, item):
+        # Retourner la date actuelle pour indiquer que le contenu est à jour
+        from django.utils import timezone
+        return timezone.now()
 
 
 class AdSitemap(Sitemap):
