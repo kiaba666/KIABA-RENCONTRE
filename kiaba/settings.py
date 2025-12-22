@@ -577,11 +577,9 @@ ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/auth/login/"
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/dashboard/"
 
 # Désactiver le rate limiting d'allauth pour éviter les erreurs Redis
+# (Nouvelle API : ACCOUNT_RATE_LIMITS ; on laisse vide pour tout désactiver
+# et on supprime les anciens paramètres dépréciés pour éviter les warnings)
 ACCOUNT_RATE_LIMITS = {}
-ACCOUNT_LOGIN_ATTEMPTS_LIMIT = None
-ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = None
-ACCOUNT_PASSWORD_RESET_ATTEMPTS_LIMIT = None
-ACCOUNT_PASSWORD_RESET_ATTEMPTS_TIMEOUT = None
 
 # Désactiver la page de confirmation de déconnexion
 ACCOUNT_LOGOUT_ON_GET = True
