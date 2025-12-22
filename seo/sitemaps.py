@@ -27,11 +27,6 @@ class StaticSitemap(Sitemap):
             return "/"  # Page d'accueil
         return reverse(item)
     
-    def get_urls(self, page=1, site=None, protocol=None):
-        """Override pour forcer HTTPS"""
-        # Forcer HTTPS même si protocol n'est pas fourni
-        return super().get_urls(page=page, site=site, protocol='https')
-    
     def lastmod(self, item):
         # Retourner la date actuelle pour indiquer que le contenu est à jour
         from django.utils import timezone
@@ -48,11 +43,6 @@ class AdSitemap(Sitemap):
 
     def location(self, obj: Ad):
         return f"/ads/{obj.slug}"
-    
-    def get_urls(self, page=1, site=None, protocol=None):
-        """Override pour forcer HTTPS"""
-        # Forcer HTTPS même si protocol n'est pas fourni
-        return super().get_urls(page=page, site=site, protocol='https')
 
     def lastmod(self, obj: Ad):
         return obj.updated_at
@@ -68,11 +58,6 @@ class CitySitemap(Sitemap):
 
     def location(self, obj: City):
         return f"/ads?city={obj.slug}"
-    
-    def get_urls(self, page=1, site=None, protocol=None):
-        """Override pour forcer HTTPS"""
-        # Forcer HTTPS même si protocol n'est pas fourni
-        return super().get_urls(page=page, site=site, protocol='https')
 
 
 class CategorySitemap(Sitemap):
@@ -89,11 +74,6 @@ class CategorySitemap(Sitemap):
 
     def location(self, item):
         return f"/ads?category={item}"
-    
-    def get_urls(self, page=1, site=None, protocol=None):
-        """Override pour forcer HTTPS"""
-        # Forcer HTTPS même si protocol n'est pas fourni
-        return super().get_urls(page=page, site=site, protocol='https')
 
 
 class CityCategorySitemap(Sitemap):
@@ -113,8 +93,3 @@ class CityCategorySitemap(Sitemap):
     def location(self, item):
         city_slug, category = item
         return f"/ads?city={city_slug}&category={category}"
-    
-    def get_urls(self, page=1, site=None, protocol=None):
-        """Override pour forcer HTTPS"""
-        # Forcer HTTPS même si protocol n'est pas fourni
-        return super().get_urls(page=page, site=site, protocol='https')

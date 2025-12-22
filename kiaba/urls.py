@@ -26,18 +26,20 @@ from django.http import HttpRequest, HttpResponse
 
 def sitemap_https(request: HttpRequest) -> HttpResponse:
     """Vue personnalisée pour forcer HTTPS dans le sitemap"""
-    # Créer une requête avec HTTPS forcé
+    # Forcer HTTPS dans les headers de la requête
     request.META['wsgi.url_scheme'] = 'https'
     request.META['HTTP_X_FORWARDED_PROTO'] = 'https'
-    return sitemap(request, {
-        "sitemaps": {
+    # Appeler la vue sitemap avec les sitemaps (sitemaps doit être un dict)
+    return sitemap(
+        request,
+        {
             "static": StaticSitemap,
             "ads": AdSitemap,
             "cities": CitySitemap,
             "categories": CategorySitemap,
             "city_categories": CityCategorySitemap,
         }
-    })
+    )
 
 urlpatterns = [
     path("admin/", admin.site.urls),
