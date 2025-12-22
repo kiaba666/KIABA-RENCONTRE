@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.validators import RegexValidator
+from allauth.account.forms import LoginForm, SignupForm
 from .models import Profile, RechargePackage, BoostOption, EmailOTP
 from ads.models import City
 
@@ -131,3 +132,41 @@ class BoostForm(forms.Form):
         label="Utiliser un booster gratuit (si disponible)",
         help_text="Vous pouvez utiliser un booster gratuit au lieu de payer",
     )
+
+
+class CustomLoginForm(LoginForm):
+    """
+    Formulaire de connexion personnalisé utilisé par allauth.
+    Pour l'instant, on garde le comportement par défaut et on se contente
+    éventuellement d'ajouter des classes CSS si besoin.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ajout de classes Tailwind pour correspondre au design
+        self.fields["login"].widget.attrs.update(
+            {
+                "class": "w-full px-3 py-2 border border-gray-300 rounded-lg",
+                "placeholder": "Email",
+            }
+        )
+        self.fields["password"].widget.attrs.update(
+            {
+                "class": "w-full px-3 py-2 border border-gray-300 rounded-lg",
+                "placeholder": "Mot de passe",
+            }
+        )
+
+
+class CustomSignupForm(SignupForm):
+    """
+    Formulaire d'inscription personnalisé utilisé par allauth.
+    On garde la logique par défaut, avec seulement un peu de style.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            field.widget.attrs.setdefault(
+                "class", "w-full px-3 py-2 border border-gray-300 rounded-lg"
+            )
