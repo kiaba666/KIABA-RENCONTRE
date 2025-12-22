@@ -89,13 +89,13 @@
   <div class="flex-1">
 <header class="mb-3 md:mb-4">
   <h1 class="text-2xl font-bold text-gray-900">
-    {% if selected_city %}Annonces {{ selected_category|default:"adultes" }} à {{ selected_city.name }}, Côte d'Ivoire · KIABA CI{% elif selected_category %}Annonces {{ selected_category|title }} en Côte d'Ivoire · KIABA CI{% else %}Annonces Adultes en Côte d'Ivoire · KIABA CI - Alternative Bizi Jedolo Locanto{% endif %}
+    {% if selected_city %}Annonces {{ selected_category|default:"adultes" }} à {{ selected_city.name }}, Côte d'Ivoire · KIABA CI{% elif selected_category %}Annonces {{ selected_category|title }} en Côte d'Ivoire · KIABA CI{% else %}Annonces Adultes en Côte d'Ivoire · KIABA CI{% endif %}
   </h1>
   <p class="text-sm text-gray-600 mt-1">
     {% if selected_city %}
-      Découvrez les meilleures annonces {% if selected_category %}{{ selected_category|title }} {% endif %}à {{ selected_city.name }}, Côte d'Ivoire. KIABA CI - Alternative locale à Bizi {{ selected_city.name }}, Jedolo CI et Locanto CI. Prostitution, escort, rencontres.
+      Découvrez les meilleures annonces {% if selected_category %}{{ selected_category|title }} {% endif %}à {{ selected_city.name }}, Côte d'Ivoire. Prostitution, escort, rencontres.
     {% else %}
-      Parcourez des annonces vérifiées dans toute la Côte d'Ivoire. KIABA CI est l'alternative locale à Bizi, Jedolo CI et Locanto CI pour les rencontres adultes, prostitution et escort en Côte d'Ivoire.
+      Parcourez des annonces vérifiées dans toute la Côte d'Ivoire.
     {% endif %}
   </p>
 </header>
