@@ -16,13 +16,28 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from seo.sitemaps import StaticSitemap, AdSitemap, CitySitemap, CategorySitemap, CityCategorySitemap
 from django.views.static import serve
-from django.urls import re_path
+from django.http import HttpRequest, HttpResponse
+
+def sitemap_https(request: HttpRequest) -> HttpResponse:
+    """Vue personnalisée pour forcer HTTPS dans le sitemap"""
+    # Créer une requête avec HTTPS forcé
+    request.META['wsgi.url_scheme'] = 'https'
+    request.META['HTTP_X_FORWARDED_PROTO'] = 'https'
+    return sitemap(request, {
+        "sitemaps": {
+            "static": StaticSitemap,
+            "ads": AdSitemap,
+            "cities": CitySitemap,
+            "categories": CategorySitemap,
+            "city_categories": CityCategorySitemap,
+        }
+    })
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -33,16 +48,7 @@ urlpatterns = [
     path("", include("seo.urls")),
     path(
         "sitemap.xml",
-        sitemap,
-        {
-            "sitemaps": {
-                "static": StaticSitemap,
-                "ads": AdSitemap,
-                "cities": CitySitemap,
-                "categories": CategorySitemap,
-                "city_categories": CityCategorySitemap,
-            }
-        },
+        sitemap_https,
         name="django.contrib.sitemaps.views.sitemap",
     ),
 ]

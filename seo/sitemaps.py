@@ -1,11 +1,16 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
+from django.conf import settings
 from ads.models import Ad, City
+
+# Forcer le domaine HTTPS pour le sitemap
+SITEMAP_DOMAIN = 'https://ci-kiaba.com'
 
 
 class StaticSitemap(Sitemap):
     changefreq = "daily"
     priority = 1.0  # Page d'accueil = priorité maximale
+    protocol = 'https'  # Forcer HTTPS pour toutes les URLs
 
     def items(self):
         return [
@@ -22,6 +27,11 @@ class StaticSitemap(Sitemap):
             return "/"  # Page d'accueil
         return reverse(item)
     
+    def get_urls(self, page=1, site=None, protocol=None):
+        """Override pour forcer HTTPS"""
+        # Forcer HTTPS même si protocol n'est pas fourni
+        return super().get_urls(page=page, site=site, protocol='https')
+    
     def lastmod(self, item):
         # Retourner la date actuelle pour indiquer que le contenu est à jour
         from django.utils import timezone
@@ -31,12 +41,18 @@ class StaticSitemap(Sitemap):
 class AdSitemap(Sitemap):
     changefreq = "daily"
     priority = 0.9
+    protocol = 'https'  # Forcer HTTPS pour toutes les URLs
 
     def items(self):
         return Ad.objects.filter(status=Ad.Status.APPROVED).select_related("city")
 
     def location(self, obj: Ad):
         return f"/ads/{obj.slug}"
+    
+    def get_urls(self, page=1, site=None, protocol=None):
+        """Override pour forcer HTTPS"""
+        # Forcer HTTPS même si protocol n'est pas fourni
+        return super().get_urls(page=page, site=site, protocol='https')
 
     def lastmod(self, obj: Ad):
         return obj.updated_at
@@ -45,17 +61,24 @@ class AdSitemap(Sitemap):
 class CitySitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.7
+    protocol = 'https'  # Forcer HTTPS pour toutes les URLs
 
     def items(self):
         return City.objects.all()
 
     def location(self, obj: City):
         return f"/ads?city={obj.slug}"
+    
+    def get_urls(self, page=1, site=None, protocol=None):
+        """Override pour forcer HTTPS"""
+        # Forcer HTTPS même si protocol n'est pas fourni
+        return super().get_urls(page=page, site=site, protocol='https')
 
 
 class CategorySitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.6
+    protocol = 'https'  # Forcer HTTPS pour toutes les URLs
 
     def items(self):
         return [
@@ -66,11 +89,17 @@ class CategorySitemap(Sitemap):
 
     def location(self, item):
         return f"/ads?category={item}"
+    
+    def get_urls(self, page=1, site=None, protocol=None):
+        """Override pour forcer HTTPS"""
+        # Forcer HTTPS même si protocol n'est pas fourni
+        return super().get_urls(page=page, site=site, protocol='https')
 
 
 class CityCategorySitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.8
+    protocol = 'https'  # Forcer HTTPS pour toutes les URLs
 
     def items(self):
         cities = City.objects.all()
@@ -84,3 +113,8 @@ class CityCategorySitemap(Sitemap):
     def location(self, item):
         city_slug, category = item
         return f"/ads?city={city_slug}&category={category}"
+    
+    def get_urls(self, page=1, site=None, protocol=None):
+        """Override pour forcer HTTPS"""
+        # Forcer HTTPS même si protocol n'est pas fourni
+        return super().get_urls(page=page, site=site, protocol='https')
