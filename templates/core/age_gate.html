@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block title %}KIABA · 18+{% endblock %}
+{% block description %}Vérification d'âge requise - Site réservé aux adultes de 18 ans et plus{% endblock %}
 {% block canonical_url %}https://ci-kiaba.com/age-gate/{% endblock %}
 {% block tailwind_css %}{% comment %}Skip Tailwind CSS on age-gate - using inline CSS instead{% endcomment %}{% endblock %}
 {% block htmx_js %}{% comment %}Skip HTMX on age-gate - not needed{% endcomment %}{% endblock %}
 {% block extra_head %}
+<meta name="robots" content="noindex, nofollow" />
 <style>
   /* Minimal CSS for age-gate page - complete styling without Tailwind */
   

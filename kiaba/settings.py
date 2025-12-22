@@ -413,7 +413,11 @@ SECURE_REFERRER_POLICY = "same-origin"
 SECURE_HSTS_SECONDS = 0 if DEBUG else 3600
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
+# Configuration HTTPS pour les proxies (Render, etc.)
+# Render passe le header X-Forwarded-Proto pour indiquer HTTPS
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# Forcer Django à considérer les requêtes comme sécurisées si le proxy indique HTTPS
+USE_TLS = not DEBUG
 
 # CORS (if needed for future API)
 CORS_ALLOW_ALL_ORIGINS = DEBUG

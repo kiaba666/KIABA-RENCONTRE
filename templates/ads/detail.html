@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-{% block title %}{{ ad.title }} · KIABA{% endblock %}
+{% block title %}{{ ad.title }} · {{ ad.city.name }} · KIABA CI{% endblock %}
+{% block description %}{{ ad.title }} - {{ ad.get_category_display }} à {{ ad.city.name }}, Côte d'Ivoire. {{ ad.description_sanitized|truncatewords:25|striptags }}. Contactez directement sur KIABA, alternative à Bizi, Jedolo et Locanto.{% endblock %}
+{% block keywords %}{{ ad.title|lower }}, {{ ad.city.name|lower }}, {{ ad.get_category_display|lower }}, kiaba, kiaba ci, bizi {{ ad.city.name|lower }}, jedolo ci, locanto ci, prostitution {{ ad.city.name|lower }}, escort {{ ad.city.name|lower }}, rencontres {{ ad.city.name|lower }}, côte d'ivoire{% endblock %}
 {% block hreflang_fr_ci %}https://ci-kiaba.com/ads/{{ ad.slug }}{% endblock %}
 {% block hreflang_default %}https://ci-kiaba.com/ads/{{ ad.slug }}{% endblock %}
 {% block canonical_url %}https://ci-kiaba.com/ads/{{ ad.slug }}{% endblock %}
@@ -92,7 +94,7 @@
   <div class="flex-1">
 <article class="bg-white border rounded-xl p-4 md:p-6 shadow-sm">
   <header class="mb-4 md:mb-6">
-    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{{ ad.title }}</h1>
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{{ ad.title }} - {{ ad.get_category_display }} à {{ ad.city.name }}, Côte d'Ivoire</h1>
     <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600 mb-3">
       <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{{ ad.get_category_display }}</span>
       <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">{{ ad.city.name }}</span>
@@ -108,7 +110,7 @@
     <div class="w-full bg-gray-100 flex justify-center">
       {% if ad.media.all|length > 0 %}
         {% with first=ad.media.all.0 %}
-          <img id="mainImage" src="{{ first.image.url }}" alt="{{ ad.title }} - {{ ad.get_category_display }} à {{ ad.city.name }}, Côte d'Ivoire" class="max-w-full max-h-96 md:max-h-[500px] object-contain" loading="eager" width="800" height="600">
+          <img id="mainImage" src="{{ first.image.url }}" alt="{{ ad.title }} - {{ ad.get_category_display }} à {{ ad.city.name }}, Côte d'Ivoire | KIABA CI - Alternative Bizi Jedolo Locanto" class="max-w-full max-h-96 md:max-h-[500px] object-contain" loading="eager" width="800" height="600">
         {% endwith %}
       {% else %}
         <div class="w-full h-56 md:h-80 flex items-center justify-center text-gray-400">Aucune photo</div>
@@ -143,10 +145,14 @@
 
   <!-- Description -->
   <section class="prose max-w-none mt-6 text-gray-800">
-    <h3 class="text-lg font-semibold text-gray-900 mb-3">Description</h3>
+    <h2 class="text-lg font-semibold text-gray-900 mb-3">Description</h2>
     <div class="text-gray-700 leading-relaxed">
       {{ ad.description_sanitized|linebreaksbr }}
     </div>
+    <p class="text-sm text-gray-500 mt-4">
+      <strong>KIABA CI</strong> - Site de rencontres et petites annonces adultes en Côte d'Ivoire. Alternative locale à <strong>Bizi</strong>, <strong>Jedolo CI</strong> et <strong>Locanto CI</strong>. 
+      Trouvez des services de <strong>prostitution</strong>, d'<strong>escort</strong> et de <strong>rencontres</strong> à {{ ad.city.name }} et dans toute la Côte d'Ivoire.
+    </p>
   </section>
 
   <!-- Contact -->
@@ -207,7 +213,7 @@
             <div class="flex h-full">
               <div class="w-40 flex-shrink-0 bg-slate-100">
                 {% if similar_ad.media.count %}
-                  <img src="{{ similar_ad.media.first.image.url }}" alt="{{ similar_ad.title }} - {{ similar_ad.get_category_display }} à {{ similar_ad.city.name }}, Côte d'Ivoire" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" loading="lazy" width="160" height="160">
+                  <img src="{{ similar_ad.media.first.image.url }}" alt="{{ similar_ad.title }} - {{ similar_ad.get_category_display }} à {{ similar_ad.city.name }}, Côte d'Ivoire | KIABA CI" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" loading="lazy" width="160" height="160">
                 {% else %}
                   <div class="w-full h-full bg-slate-200 flex items-center justify-center">
                     <span class="text-slate-400 text-xs">Photo</span>

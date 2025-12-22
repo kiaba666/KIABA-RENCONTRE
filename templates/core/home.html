@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}KIABA - Site de rencontres et petites annonces adultes en Côte d'Ivoire{% endblock %}
-{% block description %}KIABA est le site de rencontres et petites annonces adultes #1 en Côte d'Ivoire. Bizi Abidjan, rencontres, escort, jedolo, locanto. Plus de {{ total_approved_ads }} annonces vérifiées.{% endblock %}
-{% block keywords %}kiaba, kiaba rencontre, bizi abidjan, bizi côte d'ivoire, jedolo, locanto, prostitution abidjan, escort abidjan, rencontres abidjan, petites annonces adultes, côte d'ivoire, ivoire, abidjan, bouaké, daloa, yamoussoukro, san-pédro, korhogo, man, gagnoa{% endblock %}
+{% block title %}KIABA CI - Site de rencontres et petites annonces adultes en Côte d'Ivoire | Alternative Bizi Jedolo Locanto{% endblock %}
+{% block description %}KIABA CI est le site de rencontres et petites annonces adultes #1 en Côte d'Ivoire. Alternative locale à Bizi, Jedolo et Locanto. Prostitution, escort, rencontres à Abidjan, Bouaké, Daloa et dans toute la Côte d'Ivoire. Plus de {{ total_approved_ads }} annonces vérifiées.{% endblock %}
+{% block keywords %}kiaba, kiaba ci, kiaba rencontre, bizi, bizi abidjan, bizi côte d'ivoire, site de bizi, jedolo, jedolo ci, locanto, locanto ci, prostitue, prostitution, pkoklé, djandjou, prostitution abidjan, escort abidjan, rencontres abidjan, petites annonces adultes, côte d'ivoire, ivoire, abidjan, bouaké, daloa, yamoussoukro, san-pédro, korhogo, man, gagnoa{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -9,9 +9,10 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "KIABA",
-  "alternateName": "KIABA Rencontre",
+        "alternateName": "KIABA Rencontre",
+        "keywords": "kiaba, kiaba ci, kiaba rencontre, bizi, jedolo ci, locanto ci, site de bizi, prostitue, prostitution, pkoklé, djandjou",
   "url": "https://ci-kiaba.com",
-  "description": "Site de rencontres et petites annonces adultes en Côte d'Ivoire",
+        "description": "KIABA CI - Site de rencontres et petites annonces adultes en Côte d'Ivoire. Alternative à Bizi, Jedolo et Locanto. Prostitution, escort, rencontres à Abidjan et dans toute la Côte d'Ivoire.",
   "inLanguage": "fr-CI",
   "publisher": {
     "@type": "Organization",
@@ -40,12 +41,13 @@
 <section class="bg-gradient-to-br from-blue-600 to-purple-700 text-white py-16 md:py-24">
   <div class="max-w-7xl mx-auto px-4 text-center">
     <h1 class="text-4xl md:text-6xl font-bold mb-6">
-      KIABA
+      KIABA CI
       <span class="block text-2xl md:text-3xl font-normal text-blue-100">
-        Rencontres & Petites Annonces Adultes
+        Site de Rencontres & Petites Annonces Adultes en Côte d'Ivoire
       </span>
     </h1>
     <p class="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+      Alternative locale à <strong>Bizi</strong>, <strong>Jedolo CI</strong> et <strong>Locanto CI</strong>. 
       Le site de rencontres #1 en Côte d'Ivoire. Plus de <strong>{{ total_approved_ads }}</strong> annonces vérifiées.
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -140,7 +142,7 @@
           {% if ad.media.count %}
             <img 
               src="{{ ad.media.first.image.url }}" 
-              alt="{{ ad.title }} - {{ ad.get_category_display }} à {{ ad.city.name }}, Côte d'Ivoire" 
+              alt="{{ ad.title }} - {{ ad.get_category_display }} à {{ ad.city.name }}, Côte d'Ivoire | KIABA CI - Alternative Bizi Jedolo Locanto" 
               class="w-full h-full object-cover" 
               loading="lazy" 
               width="400" 
@@ -175,24 +177,54 @@
     </h2>
     <div class="prose max-w-none">
       <p class="text-lg text-gray-600 mb-6">
-        <strong>KIABA</strong> est la plateforme de rencontres et petites annonces adultes de référence en Côte d'Ivoire. 
+        <strong>KIABA</strong> (également connu sous <strong>KIABA CI</strong>) est la plateforme de rencontres et petites annonces adultes de référence en Côte d'Ivoire. 
         Que vous recherchiez des <strong>escortes à Abidjan</strong>, des <strong>rencontres à Bouaké</strong>, 
         ou des <strong>services à Daloa</strong>, notre site vous connecte avec des milliers de profils vérifiés.
+      </p>
+      
+      <h3 class="text-xl font-bold text-gray-900 mb-4">KIABA : Alternative locale à Bizi, Jedolo et Locanto</h3>
+      <p class="text-lg text-gray-600 mb-4">
+        Si vous cherchez un <strong>site de Bizi</strong>, <strong>Jedolo CI</strong>, ou <strong>Locanto CI</strong> pour la Côte d'Ivoire, 
+        <strong>KIABA</strong> est votre meilleure alternative. Notre plateforme comprend les besoins locaux et offre une expérience 
+        adaptée aux utilisateurs ivoiriens recherchant des services de <strong>prostitution</strong>, d'<strong>escort</strong>, 
+        ou de <strong>rencontres adultes</strong>.
       </p>
       
       <h3 class="text-xl font-bold text-gray-900 mb-4">Nos avantages :</h3>
       <ul class="list-disc list-inside text-gray-600 space-y-2 mb-6">
         <li><strong>Annonces vérifiées</strong> : Tous nos profils sont contrôlés pour votre sécurité</li>
-        <li><strong>Couverture nationale</strong> : Présent dans plus de 100 villes de Côte d'Ivoire</li>
+        <li><strong>Couverture nationale</strong> : Présent dans plus de 100 villes de Côte d'Ivoire (Abidjan, Bouaké, Daloa, Yamoussoukro, etc.)</li>
         <li><strong>Gratuit</strong> : Publication et consultation d'annonces entièrement gratuites</li>
         <li><strong>Discret</strong> : Vos données personnelles sont protégées</li>
         <li><strong>Mobile-friendly</strong> : Interface optimisée pour smartphones et tablettes</li>
+        <li><strong>Termes locaux</strong> : Nous comprenons les recherches pour <strong>pkoklé</strong>, <strong>djandjou</strong> et autres termes ivoiriens</li>
       </ul>
       
+      <p class="text-lg text-gray-600 mb-4">
+        Rejoignez les milliers d'utilisateurs qui font confiance à <strong>KIABA</strong> (ou <strong>KIABA Rencontre</strong>) 
+        pour leurs rencontres en Côte d'Ivoire. Que vous cherchiez des services de <strong>prostitution</strong> à Abidjan, 
+        des <strong>escortes</strong> à Bouaké, ou des <strong>rencontres</strong> dans votre ville, 
+        <strong>KIABA CI</strong> est votre plateforme de référence.
+      </p>
+      
+      <p class="text-lg text-gray-600 mb-4">
+        <strong>KIABA</strong> est l'alternative ivoirienne à <strong>Locanto</strong>, <strong>Jedolo</strong> et <strong>Bizi</strong>. 
+        Nous offrons une expérience locale adaptée aux spécificités de la Côte d'Ivoire, avec un support en français 
+        et une compréhension des besoins locaux.
+      </p>
+      
+      <h3 class="text-xl font-bold text-gray-900 mb-4 mt-8">Recherches populaires sur KIABA :</h3>
+      <p class="text-lg text-gray-600 mb-4">
+        Les utilisateurs recherchent souvent : <strong>KIABA</strong>, <strong>KIABA CI</strong>, <strong>KIABA Rencontre</strong>, 
+        <strong>site de Bizi</strong>, <strong>Jedolo CI</strong>, <strong>Locanto CI</strong>, <strong>prostitution</strong>, 
+        <strong>prostitue</strong>, <strong>pkoklé</strong>, <strong>djandjou</strong>, <strong>escort Abidjan</strong>, 
+        <strong>rencontres Côte d'Ivoire</strong>, et bien d'autres termes liés aux rencontres adultes en Côte d'Ivoire.
+      </p>
+      
       <p class="text-lg text-gray-600">
-        Rejoignez les milliers d'utilisateurs qui font confiance à <strong>KIABA</strong> pour leurs rencontres en Côte d'Ivoire. 
-        Alternative locale à <strong>Locanto</strong> et <strong>Jedolo</strong>, nous offrons une expérience adaptée 
-        aux spécificités ivoiriennes.
+        <strong>KIABA</strong> répond à toutes ces recherches en offrant une plateforme complète, sécurisée et adaptée 
+        au marché ivoirien. Que vous soyez à Abidjan, Bouaké, Daloa, Yamoussoukro ou dans toute autre ville de Côte d'Ivoire, 
+        <strong>KIABA CI</strong> est votre destination pour les rencontres et petites annonces adultes.
       </p>
     </div>
   </div>
