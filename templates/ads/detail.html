@@ -186,6 +186,15 @@
         {% endif %}
       {% endif %}
     </div>
+    {# Affichage explicite des numéros saisis #}
+    <div class="mt-3 text-sm text-gray-700 space-y-1">
+      {% if ad.user.phone_e164 %}
+        <p>Numéro 1 : <span class="font-medium">{{ ad.user.phone_e164 }}</span></p>
+      {% endif %}
+      {% if ad.user.profile and ad.user.profile.whatsapp_e164 and ad.user.profile.whatsapp_e164 != ad.user.phone_e164 %}
+        <p>Numéro 2 : <span class="font-medium">{{ ad.user.profile.whatsapp_e164 }}</span></p>
+      {% endif %}
+    </div>
   </section>
 
   <!-- Annonces similaires -->
