@@ -249,7 +249,12 @@ def dashboard(request: HttpRequest) -> HttpResponse:
             display_name=request.user.username
         )
     
-    my_ads = Ad.objects.filter(user=request.user).order_by("-created_at")[:50]
+    # Afficher toutes les annonces de l'utilisateur, avec préchargement des médias
+    my_ads = (
+        Ad.objects.filter(user=request.user)
+        .order_by("-created_at")
+        .prefetch_related("media")
+    )
     return render(request, "core/dashboard.html", {"ads": my_ads, "profile": profile})
 
 
