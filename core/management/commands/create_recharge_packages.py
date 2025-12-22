@@ -76,3 +76,4 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"\n{created} formules créées/mises à jour")
         )
 
+

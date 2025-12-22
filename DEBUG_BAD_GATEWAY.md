@@ -97,3 +97,4 @@ python manage.py shell
 >>> print(settings.DEBUG)
 ```
 
+

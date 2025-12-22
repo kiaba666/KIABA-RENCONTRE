@@ -170,3 +170,4 @@ class BoostService:
             return timezone.now() < ad.urgent_until
         return True
 
+

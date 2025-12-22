@@ -175,7 +175,9 @@ class NoRateLimitAccountAdapter(DefaultAccountAdapter):
         # Envoyer l'email de notification de connexion (en arrière-plan, ne pas bloquer)
         try:
             from .tasks import send_login_notification_email
-            send_login_notification_email.delay(request.user.id)
+            # En mode Render sans Redis, les tâches sont exécutées en mode synchrone.
+            # Appeler directement la fonction pour éviter les comportements étranges de Celery.
+            send_login_notification_email(request.user.id)
         except Exception as e:
             logger.error(f"Erreur lors de l'envoi de l'email de notification: {e}", exc_info=True)
         

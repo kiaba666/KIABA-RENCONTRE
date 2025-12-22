@@ -196,15 +196,8 @@ def send_ad_published_email(self, ad_id):
         raise e
 
 
-@shared_task(
-    bind=True,
-    autoretry_for=(Exception,),
-    retry_kwargs={"max_retries": 5, "countdown": 60},
-    retry_backoff=True,
-    retry_backoff_max=600,
-    retry_jitter=True,
-)
-def send_login_notification_email(self, user_id):
+@shared_task
+def send_login_notification_email(user_id):
     """Email de notification à chaque connexion"""
     try:
         from django.contrib.auth import get_user_model
@@ -221,17 +214,20 @@ def send_login_notification_email(self, user_id):
         subject = "Connexion détectée sur votre compte"
         
         # Utiliser le nouveau service d'email
+        # Ne jamais bloquer la connexion à cause d'un email
         EmailService.send_email(
             subject=subject,
             to_emails=[user.email],
             template_name="account/email/login_notification",
             context=context,
-            fail_silently=False,
+            fail_silently=True,
         )
         
         return f"Email de notification de connexion envoyé à {user.email}"
     except Exception as e:
-        raise e
+        # Loguer mais ne jamais faire échouer la requête
+        logger.exception(f"Erreur lors de l'envoi de l'email de notification de connexion: {e}")
+        return f"Echec d'envoi de l'email de notification pour {user_id}"
 
 
 @shared_task(

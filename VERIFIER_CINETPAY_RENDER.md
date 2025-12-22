@@ -51,3 +51,4 @@ Dans les logs Render, cherchez les messages de debug qui commencent par "CinetPa
 - Si le service existe déjà, vous devez **ajouter les variables manuellement** dans le dashboard Render
 - Après avoir ajouté/modifié des variables, **redéployez toujours le service**
 
+
