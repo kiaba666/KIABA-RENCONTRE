@@ -280,6 +280,7 @@
     {% block extra_head %}{% endblock %}
   </head>
   <body class="min-h-full bg-gradient-to-b from-blue-50 to-white">
+    {% load adsense_tags %}
     {% block header %}
     <header class="sticky top-0 z-40 glass border-b">
       <div
@@ -331,6 +332,15 @@
       </div>
     </header>
     {% endblock %}
+
+    {# Bandeau publicitaire AdSense sous le header (mêmes dimensions qu'avant) #}
+    {% if ADSENSE_ENABLED %}
+    <section class="bg-white border-b">
+      <div class="max-w-7xl mx-auto px-4 py-2 flex justify-center">
+        {% adsense_ad ad_format="auto" ad_style="display:block; width:100%; max-width:970px; height:90px;" class_name="w-full flex justify-center" %}
+      </div>
+    </section>
+    {% endif %}
 
     {% block cta_section %}
     <!-- CTA Publier après le header (uniforme sur toutes les pages) -->
