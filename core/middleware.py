@@ -13,8 +13,16 @@ class RedirectMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest):
-        # Redirection HTTP vers HTTPS
-        if not request.is_secure() and not settings.DEBUG:
+        # Vérifier HTTPS en tenant compte des proxies (Render, etc.)
+        # Vérifier d'abord le header X-Forwarded-Proto (pour les proxies)
+        forwarded_proto = request.META.get('HTTP_X_FORWARDED_PROTO', '')
+        is_https = request.is_secure() or forwarded_proto == 'https'
+        
+        # Redirection HTTP vers HTTPS (sauf en DEBUG pour le développement local)
+        # Cette redirection ne se fait QUE si :
+        # 1. La requête n'est PAS en HTTPS
+        # 2. On n'est PAS en mode DEBUG (donc en production)
+        if not is_https and not settings.DEBUG:
             url = request.build_absolute_uri().replace('http://', 'https://', 1)
             return HttpResponsePermanentRedirect(url)
         
@@ -25,6 +33,8 @@ class RedirectMiddleware:
             url = request.build_absolute_uri().replace('www.', '', 1)
             return HttpResponsePermanentRedirect(url)
         
+        # Si on arrive ici, la requête est valide (HTTPS ou DEBUG)
+        # On laisse passer normalement
         return self.get_response(request)
 
 
