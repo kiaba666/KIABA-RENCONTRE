@@ -225,10 +225,17 @@
     <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
     {% endblock %}
 
+    <!-- Police propre pour le bandeau KIABA -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
       /* Styles critiques pour éviter le flash */
       body {
         visibility: hidden;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, "Noto Sans", sans-serif;
       }
       body.loaded {
         visibility: visible;
@@ -249,6 +256,36 @@
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
+      }
+
+      /* Bandeau KIABA (pub interne) */
+      .kiaba-banner {
+        background: linear-gradient(90deg, #f97316, #ec4899, #ef4444);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        animation: kiabaGlow 4s ease-in-out infinite;
+      }
+      .kiaba-banner-text,
+      .kiaba-banner-cta,
+      .kiaba-banner-logo {
+        font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      }
+      .kiaba-banner-cta {
+        background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      }
+      .kiaba-banner-cta:hover {
+        background: linear-gradient(135deg, #1e40af, #2563eb);
+      }
+      @keyframes kiabaGlow {
+        0% {
+          box-shadow: 0 0 0 rgba(236, 72, 153, 0.0);
+        }
+        50% {
+          box-shadow: 0 0 18px rgba(236, 72, 153, 0.45);
+        }
+        100% {
+          box-shadow: 0 0 0 rgba(236, 72, 153, 0.0);
+        }
       }
 
       /* Masquer les loaders et spinners par défaut */
@@ -280,7 +317,6 @@
     {% block extra_head %}{% endblock %}
   </head>
   <body class="min-h-full bg-gradient-to-b from-blue-50 to-white">
-    {% load adsense_tags %}
     {% block header %}
     <header class="sticky top-0 z-40 glass border-b">
       <div
@@ -333,14 +369,36 @@
     </header>
     {% endblock %}
 
-    {# Bandeau publicitaire AdSense sous le header (mêmes dimensions qu'avant) #}
-    {% if ADSENSE_ENABLED %}
+    {# Bandeau pub KIABA sous le header (remplace l'emplacement AdSense) #}
     <section class="bg-white border-b">
-      <div class="max-w-7xl mx-auto px-4 py-2 flex justify-center">
-        {% adsense_ad ad_format="auto" ad_style="display:block; width:100%; max-width:970px; height:90px;" class_name="w-full flex justify-center" %}
+      <div class="max-w-7xl mx-auto px-4 py-2">
+        <div class="kiaba-banner flex items-center justify-between gap-3 md:gap-4 rounded-xl px-3 py-2 md:px-4 md:py-3">
+          <div class="flex items-center gap-2 md:gap-3">
+            <div class="kiaba-banner-logo flex items-center justify-center rounded-full bg-white/90 shadow-md w-9 h-9 md:w-10 md:h-10 overflow-hidden">
+              <img
+                src="{% static 'img/logo.png' %}"
+                alt="KIABA"
+                class="w-8 h-8 md:w-9 md:h-9 object-contain"
+                loading="lazy"
+              />
+            </div>
+            <div class="leading-snug">
+              <p class="kiaba-banner-text text-[11px] md:text-sm font-semibold text-gray-900">
+                avec Kiaba inscrit toi et publie ton annonce gratuitement c'est KDO mama Anitché hein
+              </p>
+            </div>
+          </div>
+          <div class="hidden sm:flex">
+            <a
+              href="/post/"
+              class="kiaba-banner-cta inline-flex items-center rounded-full px-3 py-1.5 md:px-4 md:py-2 text-[11px] md:text-sm font-semibold text-white shadow-md"
+            >
+              Publier maintenant
+            </a>
+          </div>
+        </div>
       </div>
     </section>
-    {% endif %}
 
     {% block cta_section %}
     <!-- CTA Publier après le header (uniforme sur toutes les pages) -->
