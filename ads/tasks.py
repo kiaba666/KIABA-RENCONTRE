@@ -1,18 +1,29 @@
 from celery import shared_task
 from django.utils import timezone
 from django.core.mail import send_mail
-from .models import Ad
+from .models import Ad, AdMedia
 from accounts.tasks import send_ad_published_email
 
 
 @shared_task(bind=True, max_retries=3)
 def expire_ads(self):
+    """
+    Supprime automatiquement les annonces expirées après 2 semaines.
+    Supprime aussi les médias (images) associés pour éviter les fichiers orphelins.
+    """
     now = timezone.now()
     expired = Ad.objects.filter(expires_at__lte=now, status=Ad.Status.APPROVED)
     count = 0
     for ad in expired:
-        ad.status = Ad.Status.ARCHIVED
-        ad.save(update_fields=["status", "updated_at"])
+        # Supprimer les médias (images) associés
+        media_list = AdMedia.objects.filter(ad=ad)
+        for media in media_list:
+            if media.image:
+                media.image.delete(save=False)  # Supprimer le fichier
+            media.delete()  # Supprimer l'enregistrement
+        
+        # Supprimer l'annonce elle-même
+        ad.delete()
         count += 1
         # Envoyer l'email d'expiration (désactivé temporairement pour éviter les erreurs Redis)
         # send_ad_expiration_email.delay(ad.id)
