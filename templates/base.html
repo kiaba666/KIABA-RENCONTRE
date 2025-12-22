@@ -312,12 +312,56 @@
         background: linear-gradient(135deg, #ea580c, #eab308);
       }
 
-      /* Masquer les loaders et spinners par défaut */
-      .loader,
-      .spinner,
-      [class*="loading-indicator"],
-      [class*="spinner"] {
-        display: none !important;
+      /* Modale de chargement */
+      .loading-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+      }
+      .loading-modal.active {
+        display: flex;
+      }
+      .loading-modal-content {
+        background-color: #ffffff;
+        border: 3px solid #2563eb;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        text-align: center;
+        max-width: 300px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      }
+      .loading-modal-content h3 {
+        color: #1e40af;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+      .spinner {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e0e7ff;
+        border-top: 4px solid #2563eb;
+        border-right: 4px solid #ec4899;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .loading-modal-content p {
+        color: #666666;
+        font-size: 0.875rem;
+        margin: 0;
       }
     </style>
 
@@ -542,6 +586,98 @@
         </div>
       </div>
     </footer>
+
+    <!-- Modale de chargement -->
+    <div id="loadingModal" class="loading-modal">
+      <div class="loading-modal-content">
+        <div class="spinner"></div>
+        <h3 id="loadingTitle">Chargement...</h3>
+        <p id="loadingMessage">Veuillez patienter</p>
+      </div>
+    </div>
+
+    <!-- Script pour gérer les modales de chargement -->
+    <script>
+      // Fonction pour afficher la modale de chargement
+      function showLoadingModal(title, message) {
+        const modal = document.getElementById('loadingModal');
+        const titleEl = document.getElementById('loadingTitle');
+        const messageEl = document.getElementById('loadingMessage');
+        
+        if (title) titleEl.textContent = title;
+        if (message) messageEl.textContent = message;
+        
+        modal.classList.add('active');
+      }
+
+      // Fonction pour masquer la modale de chargement
+      function hideLoadingModal() {
+        const modal = document.getElementById('loadingModal');
+        modal.classList.remove('active');
+      }
+
+      // Gérer la soumission des formulaires
+      document.addEventListener('DOMContentLoaded', function() {
+        // Détecter le formulaire de création d'annonce (formulaire avec enctype="multipart/form-data")
+        const postForm = document.querySelector('form[enctype="multipart/form-data"]');
+        if (postForm) {
+          postForm.addEventListener('submit', function(e) {
+            // Vérifier que le formulaire est valide avant d'afficher le loader
+            if (this.checkValidity()) {
+              showLoadingModal('Création de l\'annonce', 'Votre annonce est en cours de création, veuillez patienter...');
+            }
+          });
+        }
+
+        // Gérer la soumission du formulaire de connexion
+        const loginForm = document.querySelector('form[action*="login"]');
+        if (loginForm) {
+          loginForm.addEventListener('submit', function(e) {
+            if (this.checkValidity()) {
+              showLoadingModal('Connexion en cours', 'Authentification en cours, veuillez patienter...');
+            }
+          });
+        }
+
+        // Gérer la soumission du formulaire d'inscription
+        const signupForm = document.querySelector('form[action*="signup"]');
+        if (signupForm) {
+          signupForm.addEventListener('submit', function(e) {
+            if (this.checkValidity()) {
+              showLoadingModal('Inscription en cours', 'Création de votre compte, veuillez patienter...');
+            }
+          });
+        }
+
+        // Gérer les liens de déconnexion
+        const logoutLinks = document.querySelectorAll('a[href*="logout"]');
+        logoutLinks.forEach(function(link) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const url = this.getAttribute('href');
+            showLoadingModal('Déconnexion', 'Déconnexion en cours...');
+            
+            // Rediriger après un court délai pour que la modale s'affiche
+            setTimeout(function() {
+              window.location.href = url;
+            }, 300);
+          });
+        });
+
+        // Masquer la modale si la page se recharge (en cas d'erreur)
+        window.addEventListener('pageshow', function(event) {
+          if (event.persisted) {
+            hideLoadingModal();
+          }
+        });
+
+        // Masquer la modale si on revient en arrière
+        window.addEventListener('popstate', function() {
+          hideLoadingModal();
+        });
+      });
+    </script>
+
     {% block extra_js %}{% endblock %}
 
     <!-- Google Analytics - Deferred loading -->
