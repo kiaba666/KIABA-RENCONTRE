@@ -405,6 +405,11 @@ SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
 SESSION_COOKIE_SECURE = False if DEBUG else True
 CSRF_COOKIE_SECURE = False if DEBUG else True
+# Renforcer la protection des cookies en toutes circonstances
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+# Politique de referrer plus stricte
+SECURE_REFERRER_POLICY = "same-origin"
 SECURE_HSTS_SECONDS = 0 if DEBUG else 3600
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
@@ -576,10 +581,13 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTO_LOGIN = True
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/auth/login/"
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/dashboard/"
 
-# Désactiver le rate limiting d'allauth pour éviter les erreurs Redis
-# (Nouvelle API : ACCOUNT_RATE_LIMITS ; on laisse vide pour tout désactiver
-# et on supprime les anciens paramètres dépréciés pour éviter les warnings)
-ACCOUNT_RATE_LIMITS = {}
+# Rate limiting allauth pour limiter les tentatives de bruteforce & abus
+# (utilise le cache Django ; ici LocMem en production sans Redis)
+ACCOUNT_RATE_LIMITS = {
+    "login_failed": "5/5m",        # max 5 échecs de login / 5 minutes par IP+user
+    "signup": "3/h",               # max 3 inscriptions / heure
+    "reset_password": "3/h",       # max 3 demandes de reset / heure
+}
 
 # Désactiver la page de confirmation de déconnexion
 ACCOUNT_LOGOUT_ON_GET = True
