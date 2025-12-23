@@ -158,25 +158,26 @@
   <!-- Contact -->
   <section class="mt-8">
     {% if ad.user.phone_e164 %}
-    <div class="bg-white border border-pink-500 rounded-2xl shadow-sm p-4 md:p-6 mb-4">
+    <div class="bg-white border border-pink-500 shadow-sm p-4 md:p-6 mb-4">
       <div class="text-center mb-4">
         <p class="text-xl md:text-2xl font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
-          <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-pink-100 text-pink-600">
-            <!-- Pouce en l'air -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M2 10.5A2.5 2.5 0 0 1 4.5 8H7v10H4.5A2.5 2.5 0 0 1 2 15.5v-5Z" />
-              <path d="M9 7.75 11.47 3.4A1.75 1.75 0 0 1 14.5 3.1L15 3.3a3.75 3.75 0 0 1 2.35 3.48v1.17h2.25A1.75 1.75 0 0 1 21.3 10l-1.2 7.02A3.25 3.25 0 0 1 16.9 20H9V7.75Z" />
+          <!-- Icône like (style Boxicons) -->
+          <span class="inline-flex items-center justify-center w-8 h-8 text-pink-600">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-7 w-7" fill="currentColor">
+              <path d="M2 10.5A2.5 2.5 0 0 1 4.5 8H8v11H4.5A2.5 2.5 0 0 1 2 16.5v-6Z" />
+              <path d="M9.5 4.5 11.8 2a1 1 0 0 1 1.7.7v3.3h3.9a2.5 2.5 0 0 1 2.48 2.87l-1 7A3 3 0 0 1 15 19.5H9.5V4.5Z" />
             </svg>
-          </span>
+          </span>          
           <span>Cliquez ci-dessous pour contacter</span>
         </p>
         <p class="mt-1 text-lg md:text-2xl italic font-semibold text-gray-900 flex items-center justify-center gap-2">
-          <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-600">
-            <!-- Icône utilisateur -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 12a4 4 0 1 0-4-4 4.003 4.003 0 0 0 4 4Zm0 2c-3.33 0-6 1.567-6 3.5V19a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-1.5C18 15.567 15.33 14 12 14Z" />
+          <!-- Icône utilisateur (style Boxicons) -->
+          <span class="inline-flex items-center justify-center w-8 h-8 text-purple-600">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6" fill="currentColor">
+              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" />
+              <path d="M4 19.25A4.25 4.25 0 0 1 8.25 15h7.5A4.25 4.25 0 0 1 20 19.25V20H4Z" />
             </svg>
-          </span>
+          </span>          
           <span>
             {% if ad.user.profile and ad.user.profile.display_name %}
               {{ ad.user.profile.display_name }}
@@ -187,65 +188,106 @@
         </p>
       </div>
 
-      <!-- Bouton principal téléphone -->
+      <!-- Bouton principal : affiche seulement le texte, pas le numéro -->
       <button
         type="button"
-        id="contactPhoneButton"
+        id="contactRevealButton"
         data-phone="{{ ad.user.phone_e164 }}"
-        class="w-full rounded-2xl bg-pink-600 hover:bg-pink-700 text-white py-4 md:py-5 px-4 flex flex-col items-center justify-center gap-2 shadow-lg transition-colors"
+        class="w-full bg-pink-600 hover:bg-pink-700 text-white py-4 md:py-5 px-4 flex flex-col items-center justify-center gap-2 shadow-lg transition-colors"
       >
         <div class="flex items-center justify-center gap-3">
-          <span class="inline-flex items-center justify-center w-11 h-11 rounded-full border-2 border-white">
-            <!-- Icône téléphone -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 .96-.26 11.72 11.72 0 0 0 3.68.59 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.72 11.72 0 0 0 .59 3.68 1 1 0 0 1-.26.96l-2.21 2.15Z" />
+          <!-- Icône téléphone (style Boxicons) -->
+          <span class="inline-flex items-center justify-center w-10 h-10 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-7 w-7" fill="currentColor">
+              <path d="M6.54 5.11 8.2 3.45a1.5 1.5 0 0 1 2.52.65l.7 3.01a1.5 1.5 0 0 1-.43 1.42l-1.1 1.1a9.5 9.5 0 0 0 4.24 4.24l1.1-1.1a1.5 1.5 0 0 1 1.42-.43l3.01.7a1.5 1.5 0 0 1 .65 2.52l-1.66 1.66a2.5 2.5 0 0 1-2.18.71 15.5 15.5 0 0 1-9.11-4.49A15.5 15.5 0 0 1 5.83 7.3a2.5 2.5 0 0 1 .71-2.18Z" />
             </svg>
           </span>
-          <span id="contactPhoneMasked" class="text-2xl md:text-3xl font-extrabold tracking-wide">
-            {{ ad.user.phone_e164|slice:":3" }}XXXXXXX
+          <span class="text-lg md:text-xl font-semibold tracking-wide">
+            Cliquez ici pour afficher le numéro
           </span>
         </div>
-        <span class="mt-1 md:mt-2 text-base md:text-lg underline">
-          Cliquez pour afficher le téléphone
-        </span>
       </button>
     </div>
     {% endif %}
 
-    <!-- Boutons secondaires (WhatsApp / SMS / Appel) -->
-    <div class="mt-4">
-      <h2 class="text-sm font-semibold text-gray-900 mb-2">Autres moyens de contact</h2>
-      <div class="flex flex-wrap gap-2">
+    <!-- Détails affichés après clic : numéro + méthodes WhatsApp / Appel / SMS -->
+    <div id="contactDetails" class="mt-4 hidden">
+      <p class="text-base text-gray-900 mb-3">
+        <span class="font-semibold">Numéro de téléphone :</span>
+        <span id="contactPhoneValue" class="font-bold ml-1"></span>
+      </p>
+
+      <div class="flex flex-wrap gap-2 mb-3">
         {% if ad.user.profile %}
           {% with prefs=ad.user.profile.contact_prefs %}
             {% if prefs %}
               {% if 'whatsapp' in prefs and ad.user.profile.whatsapp_e164 %}
                 {% with msg="Bonjour, je viens de KIABA: "|add:ad.title %}
-                  <a class="inline-flex items-center bg-green-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="https://wa.me/{{ ad.user.profile.whatsapp_e164|slice:'1:' }}?text={{ msg|urlencode }}" rel="nofollow noopener" target="_blank">WhatsApp</a>
+                  <a class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="https://wa.me/{{ ad.user.profile.whatsapp_e164|slice:'1:' }}?text={{ msg|urlencode }}" rel="nofollow noopener" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                      <path d="M12 2a10 10 0 0 0-8.94 14.5L2 22l5.65-1.02A10 10 0 1 0 12 2Zm0 2a8 8 0 0 1 6.86 12.24l-.26.4a1 1 0 0 1-.79.42h-.09A8 8 0 1 1 12 4Zm-3.09 4.5a.75.75 0 0 0-.7.46 4.7 4.7 0 0 0 .47 4.43 5.9 5.9 0 0 0 2.56 2.18 4.8 4.8 0 0 0 3.84.13 1 1 0 0 0 .24-1.67l-1-1a1 1 0 0 0-1.09-.2l-.83.33a.5.5 0 0 1-.47-.06 4.1 4.1 0 0 1-1.62-1.62.5.5 0 0 1-.06-.47l.33-.83a1 1 0 0 0-.2-1.09l-1-1a1 1 0 0 0-.71-.29Z" />
+                    </svg>
+                    <span>WhatsApp</span>
+                  </a>
                 {% endwith %}
               {% endif %}
               {% if 'sms' in prefs and ad.user.phone_e164 %}
-                <a class="inline-flex items-center bg-blue-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="sms:{{ ad.user.phone_e164 }}" rel="nofollow">SMS</a>
+                <a class="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="sms:{{ ad.user.phone_e164 }}" rel="nofollow">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                    <path d="M4 5h16a2 2 0 0 1 2 2v9.5A1.5 1.5 0 0 1 20.5 18H7l-3.2 2.4A1 1 0 0 1 2 19.6V7a2 2 0 0 1 2-2Z" />
+                  </svg>
+                  <span>SMS</span>
+                </a>
               {% endif %}
               {% if 'call' in prefs and ad.user.phone_e164 %}
-                <a class="inline-flex items-center bg-gray-900 text-white px-3 py-2 rounded-lg shadow text-sm" href="tel:{{ ad.user.phone_e164 }}" rel="nofollow">Appel direct</a>
+                <a class="inline-flex items-center gap-2 bg-gray-900 text-white px-3 py-2 rounded-lg shadow text-sm" href="tel:{{ ad.user.phone_e164 }}" rel="nofollow">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                    <path d="M6.54 5.11 8.2 3.45a1.5 1.5 0 0 1 2.52.65l.7 3.01a1.5 1.5 0 0 1-.43 1.42l-1.1 1.1a9.5 9.5 0 0 0 4.24 4.24l1.1-1.1a1.5 1.5 0 0 1 1.42-.43l3.01.7a1.5 1.5 0 0 1 .65 2.52l-1.66 1.66a2.5 2.5 0 0 1-2.18.71 15.5 15.5 0 0 1-9.11-4.49A15.5 15.5 0 0 1 5.83 7.3a2.5 2.5 0 0 1 .71-2.18Z" />
+                  </svg>
+                  <span>Appel direct</span>
+                </a>
               {% endif %}
             {% else %}
               {% if ad.user.profile.whatsapp_e164 %}
                 {% with msg="Bonjour, je viens de KIABA: "|add:ad.title %}
-                  <a class="inline-flex items-center bg-green-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="https://wa.me/{{ ad.user.profile.whatsapp_e164|slice:'1:' }}?text={{ msg|urlencode }}" rel="nofollow noopener" target="_blank">WhatsApp</a>
+                  <a class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="https://wa.me/{{ ad.user.profile.whatsapp_e164|slice:'1:' }}?text={{ msg|urlencode }}" rel="nofollow noopener" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                      <path d="M12 2a10 10 0 0 0-8.94 14.5L2 22l5.65-1.02A10 10 0 1 0 12 2Zm0 2a8 8 0 0 1 6.86 12.24l-.26.4a1 1 0 0 1-.79.42h-.09A8 8 0 1 1 12 4Zm-3.09 4.5a.75.75 0 0 0-.7.46 4.7 4.7 0 0 0 .47 4.43 5.9 5.9 0 0 0 2.56 2.18 4.8 4.8 0 0 0 3.84.13 1 1 0 0 0 .24-1.67l-1-1a1 1 0 0 0-1.09-.2l-.83.33a.5.5 0 0 1-.47-.06 4.1 4.1 0 0 1-1.62-1.62.5.5 0 0 1-.06-.47l.33-.83a1 1 0 0 0-.2-1.09l-1-1a1 1 0 0 0-.71-.29Z" />
+                    </svg>
+                    <span>WhatsApp</span>
+                  </a>
                 {% endwith %}
               {% endif %}
               {% if ad.user.phone_e164 %}
-                <a class="inline-flex items-center bg-blue-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="sms:{{ ad.user.phone_e164 }}" rel="nofollow">SMS</a>
-                <a class="inline-flex items-center bg-gray-900 text-white px-3 py-2 rounded-lg shadow text-sm" href="tel:{{ ad.user.phone_e164 }}" rel="nofollow">Appel direct</a>
+                <a class="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="sms:{{ ad.user.phone_e164 }}" rel="nofollow">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                    <path d="M4 5h16a2 2 0 0 1 2 2v9.5A1.5 1.5 0 0 1 20.5 18H7l-3.2 2.4A1 1 0 0 1 2 19.6V7a2 2 0 0 1 2-2Z" />
+                  </svg>
+                  <span>SMS</span>
+                </a>
+                <a class="inline-flex items-center gap-2 bg-gray-900 text-white px-3 py-2 rounded-lg shadow text-sm" href="tel:{{ ad.user.phone_e164 }}" rel="nofollow">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                    <path d="M6.54 5.11 8.2 3.45a1.5 1.5 0 0 1 2.52.65l.7 3.01a1.5 1.5 0 0 1-.43 1.42l-1.1 1.1a9.5 9.5 0 0 0 4.24 4.24l1.1-1.1a1.5 1.5 0 0 1 1.42-.43l3.01.7a1.5 1.5 0 0 1 .65 2.52l-1.66 1.66a2.5 2.5 0 0 1-2.18.71 15.5 15.5 0 0 1-9.11-4.49A15.5 15.5 0 0 1 5.83 7.3a2.5 2.5 0 0 1 .71-2.18Z" />
+                  </svg>
+                  <span>Appel direct</span>
+                </a>
               {% endif %}
             {% endif %}
           {% endwith %}
         {% else %}
           {% if ad.user.phone_e164 %}
-            <a class="inline-flex items-center bg-blue-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="sms:{{ ad.user.phone_e164 }}" rel="nofollow">SMS</a>
-            <a class="inline-flex items-center bg-gray-900 text-white px-3 py-2 rounded-lg shadow text-sm" href="tel:{{ ad.user.phone_e164 }}" rel="nofollow">Appel direct</a>
+            <a class="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="sms:{{ ad.user.phone_e164 }}" rel="nofollow">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                <path d="M4 5h16a2 2 0 0 1 2 2v9.5A1.5 1.5 0 0 1 20.5 18H7l-3.2 2.4A1 1 0 0 1 2 19.6V7a2 2 0 0 1 2-2Z" />
+              </svg>
+              <span>SMS</span>
+            </a>
+            <a class="inline-flex items-center gap-2 bg-gray-900 text-white px-3 py-2 rounded-lg shadow text-sm" href="tel:{{ ad.user.phone_e164 }}" rel="nofollow">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                <path d="M6.54 5.11 8.2 3.45a1.5 1.5 0 0 1 2.52.65l.7 3.01a1.5 1.5 0 0 1-.43 1.42l-1.1 1.1a9.5 9.5 0 0 0 4.24 4.24l1.1-1.1a1.5 1.5 0 0 1 1.42-.43l3.01.7a1.5 1.5 0 0 1 .65 2.52l-1.66 1.66a2.5 2.5 0 0 1-2.18.71 15.5 15.5 0 0 1-9.11-4.49A15.5 15.5 0 0 1 5.83 7.3a2.5 2.5 0 0 1 .71-2.18Z" />
+              </svg>
+              <span>Appel direct</span>
+            </a>
           {% endif %}
         {% endif %}
       </div>
@@ -353,24 +395,20 @@
 
 // Révéler le numéro de téléphone sur le gros bouton rose
 (function(){
-  const btn = document.getElementById("contactPhoneButton");
-  const maskedSpan = document.getElementById("contactPhoneMasked");
-  if (!btn || !maskedSpan) return;
+  const btn = document.getElementById("contactRevealButton");
+  const details = document.getElementById("contactDetails");
+  const phoneSpan = document.getElementById("contactPhoneValue");
+  if (!btn || !details || !phoneSpan) return;
 
   const fullPhone = btn.getAttribute("data-phone");
   if (!fullPhone) return;
 
   btn.addEventListener("click", function () {
-    // Affiche le numéro complet
-    maskedSpan.textContent = fullPhone;
-    // Sur mobile, on peut déclencher l'appel directement
-    try {
-      if (window.innerWidth < 768) {
-        window.location.href = "tel:" + fullPhone;
-      }
-    } catch (e) {
-      // Ignorer les erreurs éventuelles
-    }
+    // Affiche le numéro et les boutons de contact
+    phoneSpan.textContent = fullPhone;
+    details.classList.remove("hidden");
+    btn.disabled = true;
+    btn.classList.add("opacity-80", "cursor-default");
   });
 })();
 </script>
