@@ -23,15 +23,22 @@ class RedirectMiddleware:
         # 1. La requête n'est PAS en HTTPS
         # 2. On n'est PAS en mode DEBUG (donc en production)
         if not is_https and not settings.DEBUG:
+            # Construire l'URL HTTPS avec tous les paramètres
             url = request.build_absolute_uri().replace('http://', 'https://', 1)
-            return HttpResponsePermanentRedirect(url)
+            response = HttpResponsePermanentRedirect(url)
+            # Ajouter des headers pour aider Google à comprendre la redirection
+            response['Cache-Control'] = 'public, max-age=3600'
+            return response
         
         # Redirection www vers non-www (ou l'inverse selon votre préférence)
         host = request.get_host()
         if host.startswith('www.'):
             # Rediriger www.ci-kiaba.com vers ci-kiaba.com
             url = request.build_absolute_uri().replace('www.', '', 1)
-            return HttpResponsePermanentRedirect(url)
+            response = HttpResponsePermanentRedirect(url)
+            # Ajouter des headers pour aider Google à comprendre la redirection
+            response['Cache-Control'] = 'public, max-age=3600'
+            return response
         
         # Si on arrive ici, la requête est valide (HTTPS ou DEBUG)
         # On laisse passer normalement
