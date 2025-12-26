@@ -110,7 +110,7 @@
     <div class="w-full bg-gray-100 flex justify-center">
       {% if ad.media.all|length > 0 %}
         {% with first=ad.media.all.0 %}
-          <img id="mainImage" src="{{ first.image.url }}" alt="{{ ad.title }} - {{ ad.get_category_display }} à {{ ad.city.name }}, Côte d'Ivoire | KIABA CI - Alternative Bizi Jedolo Locanto" class="max-w-full max-h-96 md:max-h-[500px] object-contain" loading="eager" width="800" height="600">
+          <img id="mainImage" src="{{ first.image.url }}" alt="{{ ad.title }} - {{ ad.get_category_display }} à {{ ad.city.name }}, Côte d'Ivoire | KIABA CI" class="max-w-full max-h-96 md:max-h-[500px] object-contain" loading="eager" width="800" height="600">
         {% endwith %}
       {% else %}
         <div class="w-full h-56 md:h-80 flex items-center justify-center text-gray-400">Aucune photo</div>
@@ -149,10 +149,6 @@
     <div class="text-gray-700 leading-relaxed">
       {{ ad.description_sanitized|linebreaksbr }}
     </div>
-    <p class="text-sm text-gray-500 mt-4">
-      <strong>KIABA CI</strong> - Site de rencontres et petites annonces adultes en Côte d'Ivoire. Alternative locale à <strong>Bizi</strong>, <strong>Jedolo CI</strong> et <strong>Locanto CI</strong>. 
-      Trouvez des services de <strong>prostitution</strong>, d'<strong>escort</strong> et de <strong>rencontres</strong> à {{ ad.city.name }} et dans toute la Côte d'Ivoire.
-    </p>
   </section>
 
   <!-- Contact -->
