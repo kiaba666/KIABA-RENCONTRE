@@ -171,6 +171,111 @@
     </div>
   </section>
 
+  <!-- Section Contact (Mobile uniquement) -->
+  {% if ad.user.phone_e164 %}
+  <section class="lg:hidden mt-6">
+    <div class="bg-white border border-gray-300 shadow-sm p-4">
+      <h3 class="text-lg font-semibold text-gray-900 mb-3">Contacter l'annonceur</h3>
+      <div class="mb-3">
+        <p class="text-sm text-gray-700 mb-2">
+          <span class="font-medium">{% if ad.user.profile and ad.user.profile.display_name %}{{ ad.user.profile.display_name }}{% else %}{{ ad.user.username }}{% endif %}</span>
+        </p>
+        <p class="text-xs text-gray-500 mb-2">Référence: CI-A{{ ad.id }} phone</p>
+        <div class="mb-3">
+          <button
+            type="button"
+            id="contactRevealButtonMobile"
+            data-phone="{{ ad.user.phone_e164 }}"
+            class="w-full text-left text-sm text-blue-600 hover:text-blue-800 underline"
+          >
+            Cliquez pour afficher le téléphone
+          </button>
+          <div id="contactPhoneDisplayMobile" class="hidden mt-2">
+            <p class="text-base font-semibold text-gray-900">{{ ad.user.phone_e164 }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Détails affichés après clic : méthodes WhatsApp / Appel / SMS -->
+      <div id="contactDetailsMobile" class="hidden space-y-2">
+        <div class="flex flex-wrap gap-2">
+          {% if ad.user.profile %}
+            {% with prefs=ad.user.profile.contact_prefs %}
+              {% if prefs %}
+                {% if 'whatsapp' in prefs and ad.user.profile.whatsapp_e164 %}
+                  {% with msg="Bonjour, je viens de KIABA: "|add:ad.title %}
+                    <a class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="https://wa.me/{{ ad.user.profile.whatsapp_e164|slice:'1:' }}?text={{ msg|urlencode }}" rel="nofollow noopener" target="_blank">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                        <path d="M12 2a10 10 0 0 0-8.94 14.5L2 22l5.65-1.02A10 10 0 1 0 12 2Zm0 2a8 8 0 0 1 6.86 12.24l-.26.4a1 1 0 0 1-.79.42h-.09A8 8 0 1 1 12 4Zm-3.09 4.5a.75.75 0 0 0-.7.46 4.7 4.7 0 0 0 .47 4.43 5.9 5.9 0 0 0 2.56 2.18 4.8 4.8 0 0 0 3.84.13 1 1 0 0 0 .24-1.67l-1-1a1 1 0 0 0-1.09-.2l-.83.33a.5.5 0 0 1-.47-.06 4.1 4.1 0 0 1-1.62-1.62.5.5 0 0 1-.06-.47l.33-.83a1 1 0 0 0-.2-1.09l-1-1a1 1 0 0 0-.71-.29Z" />
+                      </svg>
+                      <span>WhatsApp</span>
+                    </a>
+                  {% endwith %}
+                {% endif %}
+                {% if 'sms' in prefs and ad.user.phone_e164 %}
+                  <a class="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="sms:{{ ad.user.phone_e164 }}" rel="nofollow">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                      <path d="M4 5h16a2 2 0 0 1 2 2v9.5A1.5 1.5 0 0 1 20.5 18H7l-3.2 2.4A1 1 0 0 1 2 19.6V7a2 2 0 0 1 2-2Z" />
+                    </svg>
+                    <span>SMS</span>
+                  </a>
+                {% endif %}
+                {% if 'call' in prefs and ad.user.phone_e164 %}
+                  <a class="inline-flex items-center gap-2 bg-gray-900 text-white px-3 py-2 rounded-lg shadow text-sm" href="tel:{{ ad.user.phone_e164 }}" rel="nofollow">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                      <path d="M6.54 5.11 8.2 3.45a1.5 1.5 0 0 1 2.52.65l.7 3.01a1.5 1.5 0 0 1-.43 1.42l-1.1 1.1a9.5 9.5 0 0 0 4.24 4.24l1.1-1.1a1.5 1.5 0 0 1 1.42-.43l3.01.7a1.5 1.5 0 0 1 .65 2.52l-1.66 1.66a2.5 2.5 0 0 1-2.18.71 15.5 15.5 0 0 1-9.11-4.49A15.5 15.5 0 0 1 5.83 7.3a2.5 2.5 0 0 1 .71-2.18Z" />
+                    </svg>
+                    <span>Appel direct</span>
+                  </a>
+                {% endif %}
+              {% else %}
+                {% if ad.user.profile.whatsapp_e164 %}
+                  {% with msg="Bonjour, je viens de KIABA: "|add:ad.title %}
+                    <a class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="https://wa.me/{{ ad.user.profile.whatsapp_e164|slice:'1:' }}?text={{ msg|urlencode }}" rel="nofollow noopener" target="_blank">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                        <path d="M12 2a10 10 0 0 0-8.94 14.5L2 22l5.65-1.02A10 10 0 1 0 12 2Zm0 2a8 8 0 0 1 6.86 12.24l-.26.4a1 1 0 0 1-.79.42h-.09A8 8 0 1 1 12 4Zm-3.09 4.5a.75.75 0 0 0-.7.46 4.7 4.7 0 0 0 .47 4.43 5.9 5.9 0 0 0 2.56 2.18 4.8 4.8 0 0 0 3.84.13 1 1 0 0 0 .24-1.67l-1-1a1 1 0 0 0-1.09-.2l-.83.33a.5.5 0 0 1-.47-.06 4.1 4.1 0 0 1-1.62-1.62.5.5 0 0 1-.06-.47l.33-.83a1 1 0 0 0-.2-1.09l-1-1a1 1 0 0 0-.71-.29Z" />
+                      </svg>
+                      <span>WhatsApp</span>
+                    </a>
+                  {% endwith %}
+                {% endif %}
+                {% if ad.user.phone_e164 %}
+                  <a class="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="sms:{{ ad.user.phone_e164 }}" rel="nofollow">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                      <path d="M4 5h16a2 2 0 0 1 2 2v9.5A1.5 1.5 0 0 1 20.5 18H7l-3.2 2.4A1 1 0 0 1 2 19.6V7a2 2 0 0 1 2-2Z" />
+                    </svg>
+                    <span>SMS</span>
+                  </a>
+                  <a class="inline-flex items-center gap-2 bg-gray-900 text-white px-3 py-2 rounded-lg shadow text-sm" href="tel:{{ ad.user.phone_e164 }}" rel="nofollow">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                      <path d="M6.54 5.11 8.2 3.45a1.5 1.5 0 0 1 2.52.65l.7 3.01a1.5 1.5 0 0 1-.43 1.42l-1.1 1.1a9.5 9.5 0 0 0 4.24 4.24l1.1-1.1a1.5 1.5 0 0 1 1.42-.43l3.01.7a1.5 1.5 0 0 1 .65 2.52l-1.66 1.66a2.5 2.5 0 0 1-2.18.71 15.5 15.5 0 0 1-9.11-4.49A15.5 15.5 0 0 1 5.83 7.3a2.5 2.5 0 0 1 .71-2.18Z" />
+                    </svg>
+                    <span>Appel direct</span>
+                  </a>
+                {% endif %}
+              {% endif %}
+            {% endwith %}
+          {% else %}
+            {% if ad.user.phone_e164 %}
+              <a class="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg shadow text-sm" href="sms:{{ ad.user.phone_e164 }}" rel="nofollow">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                  <path d="M4 5h16a2 2 0 0 1 2 2v9.5A1.5 1.5 0 0 1 20.5 18H7l-3.2 2.4A1 1 0 0 1 2 19.6V7a2 2 0 0 1 2-2Z" />
+                </svg>
+                <span>SMS</span>
+              </a>
+              <a class="inline-flex items-center gap-2 bg-gray-900 text-white px-3 py-2 rounded-lg shadow text-sm" href="tel:{{ ad.user.phone_e164 }}" rel="nofollow">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
+                  <path d="M6.54 5.11 8.2 3.45a1.5 1.5 0 0 1 2.52.65l.7 3.01a1.5 1.5 0 0 1-.43 1.42l-1.1 1.1a9.5 9.5 0 0 0 4.24 4.24l1.1-1.1a1.5 1.5 0 0 1 1.42-.43l3.01.7a1.5 1.5 0 0 1 .65 2.52l-1.66 1.66a2.5 2.5 0 0 1-2.18.71 15.5 15.5 0 0 1-9.11-4.49A15.5 15.5 0 0 1 5.83 7.3a2.5 2.5 0 0 1 .71-2.18Z" />
+                </svg>
+                <span>Appel direct</span>
+              </a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
 
   <!-- Annonces similaires -->
   {% if similar_ads %}
@@ -357,11 +462,30 @@
   show(0);
 })();
 
-// Révéler le numéro de téléphone dans la sidebar
+// Révéler le numéro de téléphone dans la sidebar (Desktop)
 (function(){
   const btn = document.getElementById("contactRevealButton");
   const details = document.getElementById("contactDetails");
   const phoneDisplay = document.getElementById("contactPhoneDisplay");
+  if (!btn || !details || !phoneDisplay) return;
+
+  const fullPhone = btn.getAttribute("data-phone");
+  if (!fullPhone) return;
+
+  btn.addEventListener("click", function () {
+    // Affiche le numéro et les boutons de contact
+    phoneDisplay.querySelector('p').textContent = fullPhone;
+    phoneDisplay.classList.remove("hidden");
+    details.classList.remove("hidden");
+    btn.style.display = "none";
+  });
+})();
+
+// Révéler le numéro de téléphone sur mobile
+(function(){
+  const btn = document.getElementById("contactRevealButtonMobile");
+  const details = document.getElementById("contactDetailsMobile");
+  const phoneDisplay = document.getElementById("contactPhoneDisplayMobile");
   if (!btn || !details || !phoneDisplay) return;
 
   const fullPhone = btn.getAttribute("data-phone");
