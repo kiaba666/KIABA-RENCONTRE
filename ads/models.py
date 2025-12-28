@@ -177,13 +177,21 @@ class AdMedia(models.Model):
         
         try:
             # Ouvrir l'image originale depuis le fichier en mémoire ou le disque
+            original_format = None
             if hasattr(self.image, 'file') and hasattr(self.image.file, 'read'):
                 # Fichier en mémoire (nouveau upload)
                 self.image.file.seek(0)
                 img = Image.open(self.image.file)
+                original_format = img.format
             elif hasattr(self.image, 'path') and os.path.exists(self.image.path):
                 # Fichier sur le disque (image existante)
                 img = Image.open(self.image.path)
+                original_format = img.format
+                # Si le format n'est pas détecté, essayer depuis l'extension
+                if not original_format:
+                    ext = os.path.splitext(self.image.path)[1].lower()
+                    format_map = {'.jpg': 'JPEG', '.jpeg': 'JPEG', '.png': 'PNG', '.webp': 'WEBP'}
+                    original_format = format_map.get(ext, 'JPEG')
             else:
                 return False
             
@@ -250,7 +258,8 @@ class AdMedia(models.Model):
                 'PNG': 'PNG',
                 'WEBP': 'WEBP',
             }
-            img_format = format_map.get(img.format, 'JPEG')
+            # Utiliser le format original détecté ou celui de l'image
+            img_format = format_map.get(original_format or img.format, 'JPEG')
             
             if img_format == 'PNG':
                 img.save(output, format='PNG', quality=95)
@@ -265,18 +274,28 @@ class AdMedia(models.Model):
             output.seek(0)
             
             # Remplacer le fichier image
-            # Si c'est un nouveau fichier, on remplace le contenu
-            if hasattr(self.image, 'file'):
-                # Nouveau fichier uploadé
+            if hasattr(self.image, 'file') and hasattr(self.image.file, 'read'):
+                # Nouveau fichier uploadé (en mémoire)
                 self.image.file.seek(0)
                 self.image.file = ContentFile(output.read())
             else:
-                # Fichier existant, on doit le sauvegarder
-                self.image.save(
-                    self.image.name,
-                    ContentFile(output.read()),
-                    save=False
-                )
+                # Fichier existant sur le disque - sauvegarder directement
+                # Lire le contenu modifié
+                output.seek(0)
+                image_content = output.read()
+                
+                # Sauvegarder le fichier modifié
+                # Si l'image a un chemin, écrire directement
+                if hasattr(self.image, 'path') and os.path.exists(self.image.path):
+                    with open(self.image.path, 'wb') as f:
+                        f.write(image_content)
+                else:
+                    # Sinon, utiliser la méthode save de Django
+                    self.image.save(
+                        self.image.name,
+                        ContentFile(image_content),
+                        save=False
+                    )
             
             output.close()
             self._watermark_applied = True
@@ -310,11 +329,18 @@ class AdMedia(models.Model):
                 # Nouvelle instance, l'image sera traitée
                 image_changed = bool(self.image)
             
-            # Appliquer le filigrane avant la sauvegarde si c'est une nouvelle image
-            if image_changed and self.image:
-                self._add_watermark()
-            
+            # Sauvegarder d'abord pour obtenir le chemin du fichier
             super().save(*args, **kwargs)
+            
+            # Appliquer le filigrane après la sauvegarde pour les images existantes
+            # (pour avoir accès au chemin du fichier sur le disque)
+            if image_changed and self.image:
+                watermark_applied = self._add_watermark()
+                # Si le filigrane a été appliqué et qu'on a écrit directement sur le disque,
+                # on doit rafraîchir l'instance pour que Django reconnaisse le changement
+                if watermark_applied:
+                    # Rafraîchir depuis la base de données
+                    self.refresh_from_db()
             
             # Ensure only one primary
             if self.is_primary:

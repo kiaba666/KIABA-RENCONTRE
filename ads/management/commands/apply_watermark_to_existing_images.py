@@ -1,9 +1,11 @@
 """
 Commande pour appliquer le filigrane aux images existantes
 """
+import os
 from django.core.management.base import BaseCommand
 from ads.models import AdMedia
 from django.db import transaction
+from django.conf import settings
 
 
 class Command(BaseCommand):
@@ -26,6 +28,27 @@ class Command(BaseCommand):
         dry_run = options['dry_run']
         limit = options['limit']
         
+        # Vérifier que le logo existe
+        logo_path = None
+        if hasattr(settings, 'STATICFILES_DIRS') and settings.STATICFILES_DIRS:
+            for static_dir in settings.STATICFILES_DIRS:
+                potential_path = os.path.join(str(static_dir), 'img', 'logo.png')
+                if os.path.exists(potential_path):
+                    logo_path = potential_path
+                    break
+        
+        if not logo_path:
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'img', 'logo.png')
+        
+        if not os.path.exists(logo_path):
+            self.stdout.write(
+                self.style.ERROR(f"✗ Logo introuvable à: {logo_path}")
+            )
+            self.stdout.write("Vérifiez que le fichier static/img/logo.png existe.")
+            return
+        
+        self.stdout.write(f"Logo trouvé: {logo_path}")
+        
         # Récupérer toutes les images
         all_media = AdMedia.objects.all()
         if limit:
@@ -42,6 +65,15 @@ class Command(BaseCommand):
                 if not media.image:
                     continue
                 
+                # Vérifier que le fichier existe
+                if hasattr(media.image, 'path'):
+                    if not os.path.exists(media.image.path):
+                        self.stdout.write(
+                            self.style.WARNING(f"  ⚠ Fichier introuvable: {media.image.name}")
+                        )
+                        errors += 1
+                        continue
+                
                 # Réinitialiser le flag pour forcer l'application du filigrane
                 media._watermark_applied = False
                 
@@ -51,8 +83,9 @@ class Command(BaseCommand):
                     # Appliquer le filigrane
                     result = media._add_watermark()
                     if result:
-                        # Sauvegarder l'image modifiée
-                        media.save()
+                        # Sauvegarder l'image modifiée (même si le fichier a été écrit directement)
+                        # Cela met à jour les métadonnées dans la base de données
+                        media.save(update_fields=[])  # Sauvegarder sans mettre à jour de champs spécifiques
                         processed += 1
                         self.stdout.write(
                             self.style.SUCCESS(f"  ✓ Filigrane appliqué: {media.image.name} (Ad #{media.ad_id})")
