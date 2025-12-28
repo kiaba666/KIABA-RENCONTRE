@@ -245,16 +245,23 @@ class AdMedia(models.Model):
             
             logo = logo.resize((new_logo_width, new_logo_height), Image.Resampling.LANCZOS)
             
-            # Appliquer une transparence au logo (opacité 40%)
-            alpha = logo.split()[3]
-            alpha = ImageEnhance.Brightness(alpha).enhance(0.4)
-            logo.putalpha(alpha)
-            
             # Calculer la position du logo au centre
             x = (img_width - new_logo_width) // 2
             y = (img_height - new_logo_height) // 2
             
-            # Coller le logo sur l'image
+            # Créer un masque avec transparence (opacité 40%)
+            if logo.mode == 'RGBA':
+                # Extraire le canal alpha
+                alpha = logo.split()[3]
+                # Réduire l'opacité à 40%
+                alpha = alpha.point(lambda p: int(p * 0.4))
+                # Créer une nouvelle image avec l'alpha modifié
+                logo_with_alpha = Image.new('RGBA', logo.size, (0, 0, 0, 0))
+                logo_with_alpha.paste(logo, (0, 0))
+                logo_with_alpha.putalpha(alpha)
+                logo = logo_with_alpha
+            
+            # Coller le logo sur l'image avec le masque alpha
             img.paste(logo, (x, y), logo)
             
             # Sauvegarder l'image modifiée
