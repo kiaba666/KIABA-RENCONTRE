@@ -249,19 +249,7 @@ class AdMedia(models.Model):
             x = (img_width - new_logo_width) // 2
             y = (img_height - new_logo_height) // 2
             
-            # Créer un masque avec transparence (opacité 40%)
-            if logo.mode == 'RGBA':
-                # Extraire le canal alpha
-                alpha = logo.split()[3]
-                # Réduire l'opacité à 40%
-                alpha = alpha.point(lambda p: int(p * 0.4))
-                # Créer une nouvelle image avec l'alpha modifié
-                logo_with_alpha = Image.new('RGBA', logo.size, (0, 0, 0, 0))
-                logo_with_alpha.paste(logo, (0, 0))
-                logo_with_alpha.putalpha(alpha)
-                logo = logo_with_alpha
-            
-            # Coller le logo sur l'image avec le masque alpha
+            # Coller le logo sur l'image (100% opaque, pas de transparence)
             img.paste(logo, (x, y), logo)
             
             # Sauvegarder l'image modifiée
