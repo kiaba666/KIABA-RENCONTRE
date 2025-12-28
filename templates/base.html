@@ -364,22 +364,22 @@
         margin: 0;
       }
 
-      /* Chapeau de Noël sur le logo */
+      /* Image de fête sur le logo */
       .logo-container {
         position: relative;
         display: inline-block;
       }
-      .christmas-hat {
+      .holiday-image {
         position: absolute;
         top: -18px;
         left: -12px;
         width: 56px;
         height: auto;
         z-index: 10;
-        animation: hatWiggle 2s ease-in-out infinite;
+        animation: holidayWiggle 2s ease-in-out infinite;
         transform-origin: bottom center;
       }
-      @keyframes hatWiggle {
+      @keyframes holidayWiggle {
         0%, 100% { transform: rotate(-5deg); }
         50% { transform: rotate(5deg); }
       }
@@ -412,12 +412,22 @@
       >
         <a href="/" class="text-2xl font-semibold tracking-tight text-gray-900">
           <div class="logo-container">
-            <img
-              src="{% static 'img/christmas_hat.png' %}"
-              alt="Chapeau de Noël"
-              class="christmas-hat"
-              loading="eager"
-            />
+            {% now "Y-m-d" as current_date %}
+            {% if current_date >= "2026-01-01" %}
+              <img
+                src="{% static 'img/newyear2026.png' %}"
+                alt="Happy New Year 2026"
+                class="holiday-image"
+                loading="eager"
+              />
+            {% else %}
+              <img
+                src="{% static 'img/champagne.png' %}"
+                alt="Champagne"
+                class="holiday-image"
+                loading="eager"
+              />
+            {% endif %}
             <img
               src="{% static 'img/logo.png' %}"
               alt="KIABA - Site de rencontres et petites annonces adultes en Côte d'Ivoire"
