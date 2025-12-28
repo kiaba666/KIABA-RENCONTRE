@@ -174,13 +174,16 @@
   <!-- Section Contact (Mobile uniquement) -->
   {% if ad.user.phone_e164 %}
   <section class="lg:hidden mt-6">
-    <div class="bg-white border border-gray-300 shadow-sm">
+    <div class="bg-white border border-gray-300 shadow-sm rounded-lg overflow-hidden">
       <button
         type="button"
         id="toggleContactMobile"
-        class="w-full text-left p-4 text-sm text-blue-600 hover:text-blue-800 underline"
+        class="w-full flex items-center justify-center gap-2 p-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold text-base rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
       >
-        Cliquez pour afficher le téléphone
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor">
+          <path d="M6.54 5.11 8.2 3.45a1.5 1.5 0 0 1 2.52.65l.7 3.01a1.5 1.5 0 0 1-.43 1.42l-1.1 1.1a9.5 9.5 0 0 0 4.24 4.24l1.1-1.1a1.5 1.5 0 0 1 1.42-.43l3.01.7a1.5 1.5 0 0 1 .65 2.52l-1.66 1.66a2.5 2.5 0 0 1-2.18.71 15.5 15.5 0 0 1-9.11-4.49A15.5 15.5 0 0 1 5.83 7.3a2.5 2.5 0 0 1 .71-2.18Z" />
+        </svg>
+        <span id="toggleContactMobileText">Cliquez pour afficher le téléphone</span>
       </button>
       <div id="contactContentMobile" class="hidden px-4 pb-4">
         <!-- Header -->
@@ -373,13 +376,16 @@
     <div class="sticky top-20 space-y-4">
       <!-- Section Contact -->
       {% if ad.user.phone_e164 %}
-      <div class="bg-white border border-gray-300 shadow-sm">
+      <div class="bg-white border border-gray-300 shadow-sm rounded-lg overflow-hidden">
         <button
           type="button"
           id="toggleContactDesktop"
-          class="w-full text-left p-4 text-sm text-blue-600 hover:text-blue-800 underline"
+          class="w-full flex items-center justify-center gap-2 p-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold text-base rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
         >
-          Cliquez pour afficher le téléphone
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor">
+            <path d="M6.54 5.11 8.2 3.45a1.5 1.5 0 0 1 2.52.65l.7 3.01a1.5 1.5 0 0 1-.43 1.42l-1.1 1.1a9.5 9.5 0 0 0 4.24 4.24l1.1-1.1a1.5 1.5 0 0 1 1.42-.43l3.01.7a1.5 1.5 0 0 1 .65 2.52l-1.66 1.66a2.5 2.5 0 0 1-2.18.71 15.5 15.5 0 0 1-9.11-4.49A15.5 15.5 0 0 1 5.83 7.3a2.5 2.5 0 0 1 .71-2.18Z" />
+          </svg>
+          <span id="toggleContactDesktopText">Cliquez pour afficher le téléphone</span>
         </button>
         <div id="contactContentDesktop" class="hidden px-4 pb-4">
           <!-- Header -->
@@ -564,29 +570,31 @@
   const toggleBtnDesktop = document.getElementById("toggleContactDesktop");
   const contentMobile = document.getElementById("contactContentMobile");
   const contentDesktop = document.getElementById("contactContentDesktop");
+  const textMobile = document.getElementById("toggleContactMobileText");
+  const textDesktop = document.getElementById("toggleContactDesktopText");
 
-  function toggleContent(content, button) {
-    if (content && button) {
+  function toggleContent(content, textElement) {
+    if (content && textElement) {
       const isHidden = content.classList.contains("hidden");
       if (isHidden) {
         content.classList.remove("hidden");
-        button.textContent = "Masquer le téléphone";
+        textElement.textContent = "Masquer le téléphone";
       } else {
         content.classList.add("hidden");
-        button.textContent = "Cliquez pour afficher le téléphone";
+        textElement.textContent = "Cliquez pour afficher le téléphone";
       }
     }
   }
 
-  if (toggleBtnMobile && contentMobile) {
+  if (toggleBtnMobile && contentMobile && textMobile) {
     toggleBtnMobile.addEventListener("click", function() {
-      toggleContent(contentMobile, toggleBtnMobile);
+      toggleContent(contentMobile, textMobile);
     });
   }
 
-  if (toggleBtnDesktop && contentDesktop) {
+  if (toggleBtnDesktop && contentDesktop && textDesktop) {
     toggleBtnDesktop.addEventListener("click", function() {
-      toggleContent(contentDesktop, toggleBtnDesktop);
+      toggleContent(contentDesktop, textDesktop);
     });
   }
 })();
