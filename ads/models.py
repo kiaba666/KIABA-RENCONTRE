@@ -175,24 +175,31 @@ class AdMedia(models.Model):
         if not self.image or self._watermark_applied:
             return False
         
+        import logging
+        logger = logging.getLogger(__name__)
+        
         try:
-            # Ouvrir l'image originale depuis le fichier en mémoire ou le disque
+            # Déterminer le chemin de l'image
+            image_path = None
             original_format = None
-            if hasattr(self.image, 'file') and hasattr(self.image.file, 'read'):
+            
+            if hasattr(self.image, 'path') and os.path.exists(self.image.path):
+                # Fichier sur le disque (image existante)
+                image_path = self.image.path
+                img = Image.open(image_path)
+                original_format = img.format
+                # Si le format n'est pas détecté, essayer depuis l'extension
+                if not original_format:
+                    ext = os.path.splitext(image_path)[1].lower()
+                    format_map = {'.jpg': 'JPEG', '.jpeg': 'JPEG', '.png': 'PNG', '.webp': 'WEBP'}
+                    original_format = format_map.get(ext, 'JPEG')
+            elif hasattr(self.image, 'file') and hasattr(self.image.file, 'read'):
                 # Fichier en mémoire (nouveau upload)
                 self.image.file.seek(0)
                 img = Image.open(self.image.file)
                 original_format = img.format
-            elif hasattr(self.image, 'path') and os.path.exists(self.image.path):
-                # Fichier sur le disque (image existante)
-                img = Image.open(self.image.path)
-                original_format = img.format
-                # Si le format n'est pas détecté, essayer depuis l'extension
-                if not original_format:
-                    ext = os.path.splitext(self.image.path)[1].lower()
-                    format_map = {'.jpg': 'JPEG', '.jpeg': 'JPEG', '.png': 'PNG', '.webp': 'WEBP'}
-                    original_format = format_map.get(ext, 'JPEG')
             else:
+                logger.warning(f"Impossible d'ouvrir l'image: {self.image.name if self.image else 'None'}")
                 return False
             
             # Convertir en RGBA si nécessaire
@@ -274,28 +281,25 @@ class AdMedia(models.Model):
             output.seek(0)
             
             # Remplacer le fichier image
-            if hasattr(self.image, 'file') and hasattr(self.image.file, 'read'):
+            output.seek(0)
+            image_content = output.read()
+            
+            if image_path and os.path.exists(image_path):
+                # Fichier existant sur le disque - écrire directement
+                with open(image_path, 'wb') as f:
+                    f.write(image_content)
+                logger.info(f"Filigrane appliqué et sauvegardé: {image_path}")
+            elif hasattr(self.image, 'file') and hasattr(self.image.file, 'read'):
                 # Nouveau fichier uploadé (en mémoire)
                 self.image.file.seek(0)
-                self.image.file = ContentFile(output.read())
+                self.image.file = ContentFile(image_content)
             else:
-                # Fichier existant sur le disque - sauvegarder directement
-                # Lire le contenu modifié
-                output.seek(0)
-                image_content = output.read()
-                
-                # Sauvegarder le fichier modifié
-                # Si l'image a un chemin, écrire directement
-                if hasattr(self.image, 'path') and os.path.exists(self.image.path):
-                    with open(self.image.path, 'wb') as f:
-                        f.write(image_content)
-                else:
-                    # Sinon, utiliser la méthode save de Django
-                    self.image.save(
-                        self.image.name,
-                        ContentFile(image_content),
-                        save=False
-                    )
+                # Utiliser la méthode save de Django
+                self.image.save(
+                    self.image.name,
+                    ContentFile(image_content),
+                    save=False
+                )
             
             output.close()
             self._watermark_applied = True

@@ -80,6 +80,10 @@ class Command(BaseCommand):
                 if dry_run:
                     self.stdout.write(f"  [DRY-RUN] Traiterait: {media.image.name} (Ad #{media.ad_id})")
                 else:
+                    # Afficher le chemin de l'image pour debug
+                    image_path = media.image.path if hasattr(media.image, 'path') else media.image.name
+                    self.stdout.write(f"  Traitement: {image_path}")
+                    
                     # Appliquer le filigrane
                     result = media._add_watermark()
                     if result:
