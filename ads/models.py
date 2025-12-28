@@ -4,6 +4,10 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from PIL import Image, ImageEnhance
+import os
+from io import BytesIO
+from django.core.files.base import ContentFile
 
 
 class City(models.Model):
@@ -156,6 +160,7 @@ class AdMedia(models.Model):
     ad = models.ForeignKey(Ad, on_delete=models.CASCADE, related_name="media")
     image = models.ImageField(upload_to="ads/")
     is_primary = models.BooleanField(default=False)
+    _watermark_applied = False  # Flag pour éviter de réappliquer le filigrane
 
     def clean(self):
         # Enforce max 5 media per Ad
@@ -165,10 +170,152 @@ class AdMedia(models.Model):
         if existing >= 5:
             raise ValidationError("Maximum 5 photos per ad.")
 
+    def _add_watermark(self):
+        """Ajoute le filigrane du logo au centre de l'image"""
+        if not self.image or self._watermark_applied:
+            return False
+        
+        try:
+            # Ouvrir l'image originale depuis le fichier en mémoire ou le disque
+            if hasattr(self.image, 'file') and hasattr(self.image.file, 'read'):
+                # Fichier en mémoire (nouveau upload)
+                self.image.file.seek(0)
+                img = Image.open(self.image.file)
+            elif hasattr(self.image, 'path') and os.path.exists(self.image.path):
+                # Fichier sur le disque (image existante)
+                img = Image.open(self.image.path)
+            else:
+                return False
+            
+            # Convertir en RGBA si nécessaire
+            if img.mode != 'RGBA':
+                img = img.convert('RGBA')
+            
+            # Chercher le logo dans STATICFILES_DIRS
+            logo_path = None
+            if hasattr(settings, 'STATICFILES_DIRS') and settings.STATICFILES_DIRS:
+                for static_dir in settings.STATICFILES_DIRS:
+                    potential_path = os.path.join(str(static_dir), 'img', 'logo.png')
+                    if os.path.exists(potential_path):
+                        logo_path = potential_path
+                        break
+            
+            # Si pas trouvé, essayer le chemin par défaut
+            if not logo_path:
+                logo_path = os.path.join(settings.BASE_DIR, 'static', 'img', 'logo.png')
+            
+            if not os.path.exists(logo_path):
+                # Si le logo n'existe pas, on ne fait rien
+                return False
+            
+            # Ouvrir le logo
+            logo = Image.open(logo_path)
+            # Convertir le logo en RGBA si nécessaire
+            if logo.mode != 'RGBA':
+                logo = logo.convert('RGBA')
+            
+            # Calculer la taille du logo (30% de la plus petite dimension de l'image)
+            img_width, img_height = img.size
+            min_dimension = min(img_width, img_height)
+            logo_size = int(min_dimension * 0.3)
+            
+            # Redimensionner le logo en gardant les proportions
+            logo_ratio = logo.width / logo.height
+            if logo.width > logo.height:
+                new_logo_width = logo_size
+                new_logo_height = int(logo_size / logo_ratio)
+            else:
+                new_logo_height = logo_size
+                new_logo_width = int(logo_size * logo_ratio)
+            
+            logo = logo.resize((new_logo_width, new_logo_height), Image.Resampling.LANCZOS)
+            
+            # Appliquer une transparence au logo (opacité 40%)
+            alpha = logo.split()[3]
+            alpha = ImageEnhance.Brightness(alpha).enhance(0.4)
+            logo.putalpha(alpha)
+            
+            # Calculer la position du logo au centre
+            x = (img_width - new_logo_width) // 2
+            y = (img_height - new_logo_height) // 2
+            
+            # Coller le logo sur l'image
+            img.paste(logo, (x, y), logo)
+            
+            # Sauvegarder l'image modifiée
+            output = BytesIO()
+            # Conserver le format original
+            format_map = {
+                'JPEG': 'JPEG',
+                'PNG': 'PNG',
+                'WEBP': 'WEBP',
+            }
+            img_format = format_map.get(img.format, 'JPEG')
+            
+            if img_format == 'PNG':
+                img.save(output, format='PNG', quality=95)
+            else:
+                # Convertir en RGB pour JPEG
+                if img.mode == 'RGBA':
+                    rgb_img = Image.new('RGB', img.size, (255, 255, 255))
+                    rgb_img.paste(img, mask=img.split()[3])
+                    img = rgb_img
+                img.save(output, format=img_format, quality=85, optimize=True)
+            
+            output.seek(0)
+            
+            # Remplacer le fichier image
+            # Si c'est un nouveau fichier, on remplace le contenu
+            if hasattr(self.image, 'file'):
+                # Nouveau fichier uploadé
+                self.image.file.seek(0)
+                self.image.file = ContentFile(output.read())
+            else:
+                # Fichier existant, on doit le sauvegarder
+                self.image.save(
+                    self.image.name,
+                    ContentFile(output.read()),
+                    save=False
+                )
+            
+            output.close()
+            self._watermark_applied = True
+            return True
+            
+        except Exception as e:
+            # En cas d'erreur, on continue sans filigrane
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Erreur lors de l'ajout du filigrane: {str(e)}")
+            return False
+
     def save(self, *args, **kwargs):
         with transaction.atomic():
             self.full_clean()
+            
+            # Vérifier si c'est une nouvelle image ou si l'image a changé
+            is_new = self.pk is None
+            image_changed = False
+            
+            if not is_new:
+                try:
+                    old_instance = AdMedia.objects.get(pk=self.pk)
+                    # Comparer les noms de fichiers pour détecter un changement
+                    old_image_name = old_instance.image.name if old_instance.image else None
+                    new_image_name = self.image.name if self.image else None
+                    image_changed = old_image_name != new_image_name
+                except AdMedia.DoesNotExist:
+                    image_changed = True
+            else:
+                # Nouvelle instance, l'image sera traitée
+                image_changed = bool(self.image)
+            
+            # Appliquer le filigrane avant la sauvegarde si c'est une nouvelle image
+            if image_changed and self.image:
+                self._add_watermark()
+            
             super().save(*args, **kwargs)
+            
             # Ensure only one primary
             if self.is_primary:
                 AdMedia.objects.filter(ad=self.ad).exclude(pk=self.pk).update(is_primary=False)
