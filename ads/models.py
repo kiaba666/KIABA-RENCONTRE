@@ -229,10 +229,10 @@ class AdMedia(models.Model):
             if logo.mode != 'RGBA':
                 logo = logo.convert('RGBA')
             
-            # Calculer la taille du logo (30% de la plus petite dimension de l'image)
+            # Calculer la taille du logo (50% de la plus petite dimension de l'image)
             img_width, img_height = img.size
             min_dimension = min(img_width, img_height)
-            logo_size = int(min_dimension * 0.3)
+            logo_size = int(min_dimension * 0.5)
             
             # Redimensionner le logo en gardant les proportions
             logo_ratio = logo.width / logo.height
